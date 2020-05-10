@@ -22,9 +22,9 @@
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
-              "src/assets/sass/paper-kit.scss",
-              "src/assets/css/demo.css",
-              "src/assets/css/nucleo-icons.css"
+              "src/app/paperkit/assets/sass/paper-kit.scss",
+              "src/app/paperkit/assets/css/demo.css",
+              "src/app/paperkit/assets/css/nucleo-icons.css"
             ],
             "scripts": []
           },
