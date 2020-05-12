@@ -5,7 +5,7 @@ import { AngularFireAuth } from '@angular/fire/auth';
 @Component({
     selector: 'app-navbar',
     templateUrl: './navbar.component.html',
-    styleUrls: ['./navbar.component.css']
+    styleUrls: ['./navbar.component.css', './navbar.component.scss']
 })
 export class NavbarComponent implements OnInit {
     private toggleButton: any;

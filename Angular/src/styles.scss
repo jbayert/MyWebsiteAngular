@@ -1,3 +1,4 @@
 /* You can add global styles to this file, and also import other style files*/ 
-@use "app/paperkit/paper-kit-styles";
-@import "~@angular/material/prebuilt-themes/indigo-pink";
+@import "~bootstrap/dist/css/bootstrap.min.css";
+@import "app/paperkit/assets/sass/paper-kit.scss";
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
