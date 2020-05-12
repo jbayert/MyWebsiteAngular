@@ -1,0 +1,11 @@
+{
+  "targets": {
+    "party-games-ef841": {
+      "hosting": {
+        "pk2-angular": [
+          "party-games-ef841"
+        ]
+      }
+    }
+  }
+}
