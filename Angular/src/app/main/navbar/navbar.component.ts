@@ -1,5 +1,6 @@
 import { Component, OnInit, ElementRef } from '@angular/core';
 import { Location } from '@angular/common';
+import { AngularFireAuth } from '@angular/fire/auth';
 
 @Component({
     selector: 'app-navbar',
@@ -10,7 +11,9 @@ export class NavbarComponent implements OnInit {
     private toggleButton: any;
     private sidebarVisible: boolean;
 
-    constructor(public location: Location, private element : ElementRef) {
+    constructor(public location: Location, 
+        private element : ElementRef,
+        public auth: AngularFireAuth) {
         this.sidebarVisible = false;
     }
 

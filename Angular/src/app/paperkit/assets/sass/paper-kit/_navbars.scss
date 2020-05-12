@@ -145,6 +145,7 @@
     }
 }
 .navbar.fixed-top{
+    z-index: 1030;
     .nav-link{
         i{
             top: 4px;

@@ -1,6 +1,12 @@
 <nav class="navbar fixed-top navbar-expand-lg bg-primary" >
     <div class="container">
         <div class="navbar-translate">
+            <div *ngIf="auth.user | async as user; else showLogin">
+                <ngx-auth-firebaseui-avatar></ngx-auth-firebaseui-avatar>
+            </div>
+            <ng-template #showLogin>
+                <button type="button" routerLink="/login" class="btn btn-success">Login</button>
+            </ng-template>
             <p class="navbar-brand" >
                 Projects by Jon Bayert
             </p>
