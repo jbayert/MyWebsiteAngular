@@ -11,7 +11,7 @@ const TAB_INDEX = {
 @Component({
   selector: 'app-login-page',
   templateUrl: './login-page.component.html',
-  styleUrls: ['./login-page.component.css' ]
+  styleUrls: ['./login-page.component.scss' ]
 })
 export class LoginPageComponent implements OnInit {
   private sub: any;
