@@ -1,34 +1,31 @@
-<!--Navbar-->
-<mdb-navbar SideClass="navbar fixed-top navbar-expand-lg navbar-dark blue lighten-1" [containerInside]="false">
-
-    <!-- Navbar brand -->
-    <mdb-navbar-brand><a class="navbar-brand" href="#"> Projects by Jon Bayert</a></mdb-navbar-brand>
-  
-    <!-- Collapsible content -->
-    <links>
-  
-      <!-- Links -->
-      <ul class="navbar-nav mr-auto">
-        <li class="nav-item">
-            <a href="https://www.linkedin.com/in/jonathan-bayert-a2a879170/" target="_blank" rel="tooltip" title="Check out my LinkedIn" class="nav-link"> LinkedIn</a>
-          </li>
-          <li class="nav-item">
-            <a href=""  target="_blank" rel="tooltip" title="Check out my LinkedIn" class="nav-link" >Projects on GitHub</a>
-          </li>
-  
-      </ul>
-      <ul class="navbar-nav ml-auto nav-flex-icons">
-        <li class="nav-item">
+<nav class="navbar fixed-top navbar-expand-lg bg-primary" >
+    <div class="container">
+        <div class="navbar-translate">
             <div *ngIf="auth.user | async as user; else showLogin">
                 <ngx-auth-firebaseui-avatar></ngx-auth-firebaseui-avatar>
             </div>
             <ng-template #showLogin>
                 <button type="button" routerLink="/login" class="btn btn-success">Login</button>
             </ng-template>
-        </li>
-      </ul>
-    </links>
-    <!-- Collapsible content -->
-  
-  </mdb-navbar>
-  <!--/.Navbar-->
+            <p class="navbar-brand" >
+                Projects by Jon Bayert
+            </p>
+            <button class="navbar-toggler navbar-burger" type="button" data-toggle="collapse" data-target="#navbarToggler" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation" (click)="sidebarToggle()">
+                <span class="navbar-toggler-bar"></span>
+                <span class="navbar-toggler-bar"></span>
+                <span class="navbar-toggler-bar"></span>
+            </button>
+        </div>
+        <div class="navbar-collapse" id="navbarToggler">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                  <a href="https://www.linkedin.com/in/jonathan-bayert-a2a879170/" target="_blank" rel="tooltip" title="Check out my LinkedIn" class="nav-link"> LinkedIn</a>
+                </li>
+                <li class="nav-item">
+                  <a href="" target="_blank" class="btn btn-danger btn-round">Projects on GitHub</a>
+                </li>
+              </ul>
+        </div>
+    </div>
+</nav>
+

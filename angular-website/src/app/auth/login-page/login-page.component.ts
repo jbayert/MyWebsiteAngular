@@ -3,7 +3,6 @@ import '@angular/material/prebuilt-themes/indigo-pink.css';
 import { authUIConfig } from '../auth-ui-config';
 import { ActivatedRoute } from '@angular/router';
 
-
 const TAB_INDEX = {
   "sign-in": 0,
   "register": 1
@@ -15,6 +14,7 @@ const TAB_INDEX = {
   styleUrls: ['./login-page.component.scss' ]
 })
 export class LoginPageComponent implements OnInit {
+  private sub: any;
   currTab: any;
   readonly authUIConfig = authUIConfig;
 
@@ -22,7 +22,7 @@ export class LoginPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.setTab(this.route.snapshot.queryParamMap.get("tab"));
-    this.route.queryParamMap.subscribe(queryParams  => {
+    this.sub = this.route.queryParamMap.subscribe(queryParams  => {
       this.setTab(queryParams.get("tab")); 
    });
   }
