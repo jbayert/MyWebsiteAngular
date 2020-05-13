@@ -6,27 +6,34 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
 import { MDBBootstrapModule } from 'angular-bootstrap-md';
+
 import { HomeComponent } from './main/home/home.component';
 import { NavbarComponent } from './main/navbar/navbar.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { environment } from '../environments/environment';
-import { LoginPageComponent } from './auth/login-page/login-page.component'
+import { LoginPageComponent } from './auth/login-page/login-page.component';
+import { LoginModalComponent } from './auth/login-modal/login-modal.component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
+
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
     NavbarComponent,
-    LoginPageComponent
+    LoginPageComponent,
+    LoginModalComponent
   ],
   imports: [
     BrowserAnimationsModule,
     BrowserModule,
     AppRoutingModule,
     NgxAuthFirebaseUIModule.forRoot(environment.firebaseConfig),
-    MDBBootstrapModule.forRoot()
+    MDBBootstrapModule.forRoot(),
+    NgbModule
   ],
+  exports:[LoginModalComponent],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent,LoginModalComponent]
 })
 export class AppModule { }
