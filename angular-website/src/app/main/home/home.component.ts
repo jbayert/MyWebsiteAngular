@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NgxAuthFirebaseUIModule } from 'ngx-auth-firebaseui';
+import { LoginModalComponent } from 'src/app/auth/login-modal/login-modal.component'
 
 @Component({
   selector: 'app-home',

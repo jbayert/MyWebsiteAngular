@@ -1,5 +1,5 @@
 <!--Navbar-->
-<mdb-navbar SideClass="navbar fixed-top navbar-expand-lg navbar-dark blue lighten-1" [containerInside]="false">
+<mdb-navbar SideClass="navbar sticky-top navbar-expand-lg navbar-dark blue lighten-1" [containerInside]="false">
 
     <!-- Navbar brand -->
     <mdb-navbar-brand><a class="navbar-brand" href="#"> Projects by Jon Bayert</a></mdb-navbar-brand>
@@ -15,7 +15,10 @@
           <li class="nav-item">
             <a href=""  target="_blank" rel="tooltip" title="Check out my LinkedIn" class="nav-link" >Projects on GitHub</a>
           </li>
-  
+          <li>
+            <app-login-modal [events] = "this.eventsSubject.asObservable()"></app-login-modal>
+            <button (click) = "emitEventToChild()">Test</button>
+          </li>
       </ul>
       <ul class="navbar-nav ml-auto nav-flex-icons">
         <li class="nav-item">
