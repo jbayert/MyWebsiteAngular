@@ -10,12 +10,14 @@ import { HomeComponent } from './main/home/home.component';
 import { NavbarComponent } from './main/navbar/navbar.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { environment } from '../environments/environment';
+import { LoginPageComponent } from './auth/login-page/login-page.component'
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
-    NavbarComponent
+    NavbarComponent,
+    LoginPageComponent
   ],
   imports: [
     BrowserAnimationsModule,
