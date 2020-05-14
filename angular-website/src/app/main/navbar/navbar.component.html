@@ -15,18 +15,15 @@
           <li class="nav-item">
             <a href=""  target="_blank" rel="tooltip" title="Check out my LinkedIn" class="nav-link" >Projects on GitHub</a>
           </li>
-          <li>
-            <app-login-modal [events] = "this.eventsSubject.asObservable()"></app-login-modal>
-            <button (click) = "emitEventToChild()">Test</button>
-          </li>
       </ul>
       <ul class="navbar-nav ml-auto nav-flex-icons">
         <li class="nav-item">
+          
             <div *ngIf="auth.user | async as user; else showLogin">
                 <ngx-auth-firebaseui-avatar></ngx-auth-firebaseui-avatar>
             </div>
             <ng-template #showLogin>
-                <button type="button" routerLink="/login" class="btn btn-success">Login</button>
+                <button type="button" (click) = this.eventsSubject.next() class="btn btn-success">Login</button>
             </ng-template>
         </li>
       </ul>
@@ -35,3 +32,6 @@
   
   </mdb-navbar>
   <!--/.Navbar-->
+
+
+  <app-login-modal [events] = "this.eventsSubject.asObservable()"></app-login-modal>
