@@ -1,0 +1,37 @@
+<header>
+    <h2>Add Media to Watch</h2>
+  </header>
+  <form
+    [formGroup] = "form"
+    (ngSubmit)= "onSubmit(form.value)">
+    <ul>
+
+    <li>
+        <label for="gameID">Game ID</label>
+        <input type="int" name="gameID" id="gameID" formControlName = "gameID">
+        </li>
+
+      <li>
+        <label for="username">Your Name</label>
+        <input type="text" name="username" id="username" formControlName = "username">
+      </li>
+
+      <li>
+        <label for="codename">Code Name</label>
+        <input type="text" name="codename" id="codename" formControlName = "codename">
+      </li>
+
+    </ul>
+    <div *ngIf = "form.get('gameID').errors">
+        <div *ngIf = "form.get('gameID').errors.required; else elseBlock" class="error">
+            GameID is required
+        </div> 
+        <ng-template #elseBlock >
+            <div *ngIf = "form.get('gameID').errors.idOutOfRange as yearErrors" class="error">
+                Must be between {{yearErrors.min}} and {{yearErrors.max}}
+            </div> 
+        </ng-template>
+    </div>
+
+    <button type="submit" [disabled] = "!form.valid">Save</button>
+  </form>
