@@ -15,7 +15,16 @@
           <li class="nav-item">
             <a href=""  target="_blank" rel="tooltip" title="Check out my LinkedIn" class="nav-link" >Projects on GitHub</a>
           </li>
+            <!-- Dropdown -->
+            <li class="nav-item dropdown" dropdown>
+              <a dropdownToggle mdbWavesEffect type="button" class="nav-link dropdown-toggle waves-light" mdbWavesEffect>
+              Games<span class="caret"></span></a>
+              <div *dropdownMenu class="dropdown-menu dropdown dropdown-primary" role="menu">
+                  <a class="dropdown-item waves-light" routerLink="/empire" >Empire</a>
+              </div>
+          </li>
       </ul>
+
       <ul class="navbar-nav ml-auto nav-flex-icons">
         <li class="nav-item">
           
