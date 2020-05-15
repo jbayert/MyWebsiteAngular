@@ -4,7 +4,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { EmpireListComponent } from './empire-list/empire-list.component';
 import { JoinGameComponent } from './join-game/join-game.component';
 
-import { EmpireComponent } from './empire.component';
+import { EmpireComponent } from './empire-home/empire.component';
 
 const routes: Routes = [
   { path: 'results', component: EmpireListComponent },
