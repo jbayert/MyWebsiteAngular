@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { AngularFireDatabase } from '@angular/fire/database';
+import { EmpireService } from '../empire.service';
 
 @Component({
   selector: 'app-join-game',
@@ -20,7 +21,10 @@ export class JoinGameComponent implements OnInit{
     });
   }
 
-  constructor(private db: AngularFireDatabase){};
+  constructor(private db: AngularFireDatabase,
+    private empireService:EmpireService){
+      console.log(this.empireService.gameActive(50));
+    };
 
 
   gameIdValidator(control: FormControl){
