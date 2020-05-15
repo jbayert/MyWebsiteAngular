@@ -1,37 +1,43 @@
 <header>
-    <h2>Add Media to Watch</h2>
+    <h2>Join a game</h2>
   </header>
   <form
     [formGroup] = "form"
     (ngSubmit)= "onSubmit(form.value)">
-    <ul>
 
-    <li>
-        <label for="gameID">Game ID</label>
-        <input type="int" name="gameID" id="gameID" formControlName = "gameID">
-        </li>
-
-      <li>
-        <label for="username">Your Name</label>
-        <input type="text" name="username" id="username" formControlName = "username">
-      </li>
-
-      <li>
-        <label for="codename">Code Name</label>
-        <input type="text" name="codename" id="codename" formControlName = "codename">
-      </li>
-
-    </ul>
-    <div *ngIf = "form.get('gameID').errors">
-        <div *ngIf = "form.get('gameID').errors.required; else elseBlock" class="error">
+    <div>
+      <label for="gameID">Game ID</label>
+      <input type="int" class="form-control" name="gameID" id="gameID" formControlName = "gameID">
+        
+      <div *ngIf = "form.get('gameID').errors&&(!form.get('gameID').pristine)">
+        <div class="alert alert-danger" *ngIf = "form.get('gameID').errors.required; else elseBlock">
             GameID is required
         </div> 
         <ng-template #elseBlock >
-            <div *ngIf = "form.get('gameID').errors.idOutOfRange as yearErrors" class="error">
+            <div class="alert alert-danger" *ngIf = "form.get('gameID').errors.idOutOfRange as yearErrors">
                 Must be between {{yearErrors.min}} and {{yearErrors.max}}
             </div> 
         </ng-template>
+      </div>
+
     </div>
+
+    <div>
+      <label for="username">Your Name</label>
+      <input type="text" class="form-control" name="username" id="username" formControlName = "username">
+      <div class="alert alert-danger" *ngIf = "form.get('username').errors&&(!form.get('username').pristine)">
+        Your Name is required.
+    </div> 
+    </div>
+
+    <div>
+      <label for="codename">Code Name</label>
+      <input type="text" class="form-control" name="codename" id="codename" formControlName = "codename">
+      <div class="alert alert-danger" *ngIf = "form.get('codename').errors&&(!form.get('codename').pristine)">
+        Your code name is required.
+      </div> 
+    </div>
+
 
     <button type="submit" [disabled] = "!form.valid">Save</button>
   </form>

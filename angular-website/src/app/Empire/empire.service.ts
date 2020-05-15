@@ -1,15 +1,21 @@
 import { Injectable } from '@angular/core';
-import { EmpireModule } from './empire.module'
+import { EmpireServiceModule } from './empire-service.module'
+import { AngularFireDatabase } from '@angular/fire/database';
 
 @Injectable({
-  providedIn: EmpireModule
+  providedIn: EmpireServiceModule
 })
 export class EmpireService {
 
-  constructor() { }
+  constructor(private db: AngularFireDatabase) { }
 
   getResults(id:number){
     var dbList = `gameData/Empire/games/${id}/users`;
-    return 
+  }
+
+  gameActive(id:number): boolean{
+    this.db.object('gameData/Empire/games/100/state').
+    console.log()
+    return false;
   }
 }
