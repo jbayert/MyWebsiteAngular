@@ -14,9 +14,14 @@
             GameID is required
         </div> 
         <ng-template #elseBlock >
-            <div class="alert alert-danger" *ngIf = "form.get('gameID').errors.idOutOfRange as yearErrors">
+            <div class="alert alert-danger" *ngIf = "form.get('gameID').errors.idOutOfRange as yearErrors; else invalidIdBlock">
                 Must be between {{yearErrors.min}} and {{yearErrors.max}}
             </div> 
+        </ng-template>
+        <ng-template #invalidIdBlock>
+          <div class="alert alert-danger" *ngIf = "form.get('gameID').errors.invalidID as invalidID;">
+            Invalid Game ID
+          </div>
         </ng-template>
       </div>
 
