@@ -23,9 +23,6 @@ export class EmpireService implements OnDestroy {
   firebaseAuth: firebase.auth.Auth;
 
   constructor(public auth: AngularFireAuth) {
-    //firebase.initializeApp(environment.firebaseConfig);
-    console.log("Start service");
-    console.log(this);
     this.RTDB = firebase.database();
     this.firebaseAuth = firebase.auth();
   }
@@ -39,11 +36,22 @@ export class EmpireService implements OnDestroy {
     return new Promise((resolutionFunc, rejectionFunc) => {
       this.RTDB.ref(`gameData/Empire/games/${id}/state`).once('value')
         .then((dataSnapshot) => {
+          console.log("got Game State");
           resolutionFunc(new GameState(dataSnapshot.val()))
         }).catch((error) => {
           rejectionFunc(error);
         });
     })
+  }
+
+  private makeGuestId(length) {
+    var result = 'guest_';
+    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for (var i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
   }
 
   gameIdRangeValidator = (control: FormControl):ValidationErrors => {
@@ -66,7 +74,6 @@ export class EmpireService implements OnDestroy {
    * returns if a game is valid for control
    */
   gameIdValidator = (control: AbstractControl): Promise<ValidationErrors | null> => {
-    console.log("gameIdValidator");
     return new Promise((resolutionFunc, rejectionFunc) => {
       this.testGameState(+control.value).then((gameState) => {
         if (gameState.canJoin) {
@@ -80,12 +87,36 @@ export class EmpireService implements OnDestroy {
     })
   }
 
-  joinGame(newUser: UserProfile): Promise<any> {
+  joinGame(newUser: UserProfile, guestID: boolean): Promise<any> {
     return new Promise((resFunc, rejFunc) => {
-      var user = this.firebaseAuth.currentUser;
-      if (user) {
+      console.log("Joining",!guestID);
+      if(!guestID){
+        var user = this.firebaseAuth.currentUser;
+        if (user) {
+          //there is a user logged in
+          var toAddRef = this.RTDB.ref(`gameData/Empire/games/${newUser.gameID}/users/${user.uid}`);
+          toAddRef.update({
+            codename: newUser.codename,
+            username: newUser.username
+          },
+          (error)=>{
+            console.log("Error", error);
+            if (error){
+              rejFunc(error);
+            }else{
+              resFunc("Player Added");
+            }
+          });
+        } else {
+          //no user logged in
+          rejFunc("No User Signed In");
+        }
+      }else{
+        var id = this.makeGuestId(8);
+        console.log(id);
         //there is a user logged in
-        var toAddRef = this.RTDB.ref(`gameData/Empire/games/${newUser.gameID}/users/${user.uid}`).update({
+        var toAddRed = this.RTDB.ref(`gameData/Empire/games/${newUser.gameID}/guests/${id}`);
+        toAddRed.update({
           codename: newUser.codename,
           username: newUser.username
         },
@@ -93,12 +124,9 @@ export class EmpireService implements OnDestroy {
           if (error){
             rejFunc(error);
           }else{
-            resFunc("Player Added");
+            resFunc("Guest Added");
           }
         });
-      } else {
-        //no user logged in
-        rejFunc("No User Signed In");
       }
     })
   }
