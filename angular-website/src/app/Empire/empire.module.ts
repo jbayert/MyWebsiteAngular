@@ -10,14 +10,16 @@ import { environment } from 'src/environments/environment';
 import { EmpireListComponent } from './empire-list/empire-list.component';
 import { JoinGameComponent } from './join-game/join-game.component';
 import { CreateGameComponent } from './create-game/create-game.component';
-import { EmpireServiceModule } from './empire-service/empire-service.module'
+import { EmpireServiceModule } from './empire-service/empire-service.module';
+import { EditUserComponent } from './edit-user/edit-user.component'
 
 @NgModule({
   declarations: [
     EmpireComponent,
     EmpireListComponent,
     JoinGameComponent,
-    CreateGameComponent
+    CreateGameComponent,
+    EditUserComponent
   ],
   imports: [
     EmpireServiceModule,

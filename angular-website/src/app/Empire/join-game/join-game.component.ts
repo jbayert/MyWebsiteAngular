@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { EmpireService } from '../empire-service/empire.service';
 import { UserProfile } from '../empire-service/empire-data.model';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-join-game',
@@ -11,8 +12,10 @@ import { UserProfile } from '../empire-service/empire-data.model';
 export class JoinGameComponent implements OnInit {
   form: FormGroup;
   test: any;
+  guestID: boolean;
 
-  constructor(private empireService: EmpireService) {
+  constructor(private empireService: EmpireService,
+              private route: ActivatedRoute) {
     console.log(empireService);
     this.test = 5;
   };
@@ -24,11 +27,22 @@ export class JoinGameComponent implements OnInit {
       gameID: new FormControl('', {
         validators: Validators.compose([
           Validators.required,
-          this.empireService.gameIdRangeValidator]), 
-        updateOn:'blur',
-        asyncValidators:this.empireService.gameIdValidator
+          this.empireService.gameIdRangeValidator]),
+        updateOn: 'blur',
+        asyncValidators: this.empireService.gameIdValidator
       })
     });
+
+    this.guestID = false;
+    this.route.queryParamMap.subscribe(queryParams  => {
+      console.log("Query")
+      console.log((!!queryParams.get("guestID"))&&(queryParams.get("guestID")!="false"))
+      
+      this.guestID = (!!queryParams.get("guestID"))&&(queryParams.get("guestID")!="false");
+      if (queryParams.get("gameID")){
+        this.form.get("gameID").setValue(+queryParams.get("gameID")); 
+      }
+   });
   }
 
   onSubmit(gameToJoin) {
@@ -36,10 +50,16 @@ export class JoinGameComponent implements OnInit {
       gameToJoin.username,
       gameToJoin.codename,
       gameToJoin.gameID);
-    this.empireService.joinGame(newUser).then((value)=>{
+    this.empireService.joinGame(newUser, this.guestID ).then((value) => {
       console.log(value);
-    }).catch((error)=>{
+    }).catch((error) => {
       console.log(error);
     });
   }
+
+  get submitBtnText():string{
+    if(!this.guestID){return "Join Game"}
+    else {return "Join as guest"}
+  }
+
 }
