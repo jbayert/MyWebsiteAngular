@@ -11,7 +11,7 @@ import { EmpireListComponent } from './empire-list/empire-list.component';
 import { JoinGameComponent } from './join-game/join-game.component';
 import { CreateGameComponent } from './create-game/create-game.component';
 import { EmpireServiceModule } from './empire-service/empire-service.module';
-import { EditUserComponent } from './edit-user/edit-user.component'
+import { PlayerPageComponent } from '../empire/player-page/player-page.component'
 
 @NgModule({
   declarations: [
@@ -19,7 +19,7 @@ import { EditUserComponent } from './edit-user/edit-user.component'
     EmpireListComponent,
     JoinGameComponent,
     CreateGameComponent,
-    EditUserComponent
+    PlayerPageComponent
   ],
   imports: [
     EmpireServiceModule,

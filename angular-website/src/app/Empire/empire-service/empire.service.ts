@@ -27,6 +27,19 @@ export class EmpireService implements OnDestroy {
     this.firebaseAuth = firebase.auth();
   }
 
+  /**
+ * Returns a random integer between min (inclusive) and max (inclusive).
+ * The value is no lower than min (or the next integer greater than min
+ * if min isn't an integer) and no greater than max (or the next integer
+ * lower than max if max isn't an integer).
+ * Using Math.round() will give you a non-uniform distribution!
+ */
+  getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
   getResults(id: number) {
     var dbList = `gameData/Empire/games/${id}/users`;
 
@@ -54,7 +67,7 @@ export class EmpireService implements OnDestroy {
     return result;
   }
 
-  gameIdRangeValidator = (control: FormControl):ValidationErrors => {
+  gameIdRangeValidator = (control: FormControl): ValidationErrors => {
     const gameID = parseInt(control.value, 10);
     const minID = EmpireConfig.gameIdRange.minID;//inclusive
     const maxID = EmpireConfig.gameIdRange.maxID;
@@ -89,8 +102,8 @@ export class EmpireService implements OnDestroy {
 
   joinGame(newUser: UserProfile, guestID: boolean): Promise<any> {
     return new Promise((resFunc, rejFunc) => {
-      console.log("Joining",!guestID);
-      if(!guestID){
+      console.log("Joining", !guestID);
+      if (!guestID) {
         var user = this.firebaseAuth.currentUser;
         if (user) {
           //there is a user logged in
@@ -99,19 +112,19 @@ export class EmpireService implements OnDestroy {
             codename: newUser.codename,
             username: newUser.username
           },
-          (error)=>{
-            console.log("Error", error);
-            if (error){
-              rejFunc(error);
-            }else{
-              resFunc("Player Added");
-            }
-          });
+            (error) => {
+              console.log("Error", error);
+              if (error) {
+                rejFunc(error);
+              } else {
+                resFunc("Player Added");
+              }
+            });
         } else {
           //no user logged in
           rejFunc("No User Signed In");
         }
-      }else{
+      } else {
         var id = this.makeGuestId(8);
         console.log(id);
         //there is a user logged in
@@ -120,14 +133,73 @@ export class EmpireService implements OnDestroy {
           codename: newUser.codename,
           username: newUser.username
         },
-        (error)=>{
-          if (error){
-            rejFunc(error);
-          }else{
-            resFunc("Guest Added");
-          }
-        });
+          (error) => {
+            if (error) {
+              rejFunc(error);
+            } else {
+              resFunc("Guest Added");
+            }
+          });
       }
+    })
+  }
+
+  createGame(timeoutMS:number = 5000,timeoutNum:number = 10): Promise<number|null> {
+    return new Promise((resFunc,rejFunction)=>{
+      if(timeoutNum<0){
+        rejFunction({reason: "Recursion Timeout." });
+      }
+
+      //set up Timeout
+      var timeoutPromis = setTimeout(() => {
+        rejFunction({reason: 'Timed out in '+ timeoutMS + 'ms.'});
+      }, timeoutMS)
+      
+
+      var user = this.firebaseAuth.currentUser;
+      if (user){
+        var id = this.getRandomInt(EmpireConfig.gameIdRange.minID,EmpireConfig.gameIdRange.maxID);
+
+        var testGameID = this.RTDB.ref(`gameData/Empire/games/${id}/roles`);
+        testGameID.transaction((currentData) =>{
+          if(currentData === null) {
+            var data = {};
+            data[user.uid] = "owner"; 
+            return data;
+          } else {
+            return;
+          }
+        },(error, committed, snapshot)=>{
+          if (error) {
+            //raise an error
+            rejFunction(error);
+          }else if(committed){
+            //finish created the game
+            var testGameID = this.RTDB.ref(`gameData/Empire/games/${id}/state`);
+            testGameID.set('accepting users').then((value)=>{
+              //add timestamp
+              var testGameID = this.RTDB.ref(`gameData/Empire/games/${id}/timestamp`);
+              testGameID.set(new Date().getTime()).then((value)=>{
+                resFunc(id);
+              }).catch((state_error)=>{
+                rejFunction({reason: "Error Updating State",error: state_error})
+              });
+            }).catch((state_error)=>{
+              rejFunction({reason: "Error Updating State",error: state_error})
+            });
+          }else{
+            //Id already taken
+            this.createGame(timeoutMS,timeoutNum-1).then((id)=>{
+              resFunc(id);
+            }).catch((error)=>{
+              rejFunction(error);
+            })
+          }
+        })
+      }else{
+        rejFunction("User Not Logged in");
+      }
+     
     })
   }
 
