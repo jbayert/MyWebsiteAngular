@@ -12,10 +12,12 @@ import { EmpireConfig } from '../empire-config';
 
 import { AngularFireAuth } from '@angular/fire/auth';
 import { BehaviorSubject } from 'rxjs';
+import { first } from 'rxjs/operators'
 
 import { GameState, GameStateOption, UserProfile } from './empire-data.model';
 import { FormControl, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Observable } from 'rxjs';
+import { GameStateListeners } from './empire-game-listener.model';
 
 @Injectable({
   providedIn: EmpireServiceModule
@@ -23,12 +25,12 @@ import { Observable } from 'rxjs';
 export class EmpireService implements OnDestroy {
   RTDB: firebase.database.Database;
   firebaseAuth: firebase.auth.Auth;
-  gameStateSubjects;
+  gameStateListeners: GameStateListeners;
 
   constructor(private auth: AngularFireAuth, private AngularDB: AngularFireDatabase) {
     this.RTDB = firebase.database();
     this.firebaseAuth = firebase.auth();
-    this.gameStateSubjects = {};
+    this.gameStateListeners = new GameStateListeners(this.RTDB);
   }
 
   /**
@@ -50,7 +52,8 @@ export class EmpireService implements OnDestroy {
    */
   getGameState(id: number): Promise<GameState> {
     return new Promise((resolutionFunc, rejectionFunc) => {
-      if (!(id in this.gameStateSubjects)) {
+      var listener = this.gameStateListeners.getAsObservable(id);
+      if (!listener) {
         //pull data
         this.RTDB.ref(`gameData/Empire/games/${id}/state`).once('value')
           .then((dataSnapshot) => {
@@ -61,33 +64,31 @@ export class EmpireService implements OnDestroy {
           });
       } else {
         //already have the state
-        console.log("getting game data");
-        console.log(this.gameStateSubjects[id].getValue());
-        resolutionFunc(this.gameStateSubjects[id].getValue())
+        listener.pipe(first())
+        .subscribe((gameState)=>{
+          resolutionFunc(gameState);
+        }
+        );
       }
     })
   }
 
-  listenGameState(id: number): Observable<GameState | null> {
-    if (!(id in this.gameStateSubjects)) {
-      //new pull
-      this.gameStateSubjects[id] = {
-        subject: null,
-        onValueChange: null,
-        ref: null
+  public listenGameState(id: number): Promise<Observable<GameState>> {
+    return new Promise(async (resFunc, rejFunc) => {
+      var listener = this.gameStateListeners.getAsObservable(id);
+      if (!listener) {
+        //need to add it
+        await this.gameStateListeners.add(id);
+        resFunc(this.gameStateListeners.getAsObservable(id));
+      } else {
+        //already have the listener
+        resFunc( listener);
       }
-      this.gameStateSubjects[id].subject  = new BehaviorSubject<GameState | null>(null);
-      this.gameStateSubjects[id].ref = this.RTDB.ref(`gameData/Empire/games/${id}/state`);
-      this.gameStateSubjects[id].onValueChange = this.gameStateSubjects[id].ref.on('value', (dataSnapshot) => {
-        console.log("New value");
-        this.gameStateSubjects[id].subject.next(new GameState(dataSnapshot.val()));
-      });
+    })
+  }
 
-      return this.gameStateSubjects[id].subject.asObservable();
-    } else {
-      console.log("pulling stored again");
-      return this.gameStateSubjects[id].subject.asObservable();
-    }
+  public stopListeningToGameState(id: number){
+    this.gameStateListeners.killListener(id);
   }
 
   /**
@@ -128,16 +129,18 @@ export class EmpireService implements OnDestroy {
    * returns if a game is valid for control
    */
   gameIdValidator = (control: AbstractControl): Promise<ValidationErrors | null> => {
-    return new Promise((resolutionFunc, rejectionFunc) => {
-      this.getGameState(+control.value).then((gameState) => {
+    return new Promise(async (resolutionFunc, rejectionFunc) => {
+      try{
+        var gameState = await this.getGameState(+control.value);
         if (gameState.canJoin) {
           resolutionFunc(null);
         } else {
           resolutionFunc({ invalidID: "Invalid Game ID" });
         }
-      }).catch((error) => {
+      }
+      catch(error) {
         resolutionFunc({ invalidID: "Invalid Game ID" });
-      });
+      }
     })
   }
 
@@ -249,14 +252,7 @@ export class EmpireService implements OnDestroy {
     })
   }
 
-  ngOnDestroy() {
-    for (var key of Object.keys(this.gameStateSubjects)) {
-      console.log(`Destroying ${key}`);
-      //remove the listeners
-      this.gameStateSubjects[key].ref.off('value', this.gameStateSubjects[key].onValueChange);
-    }
-  }
-
+  
   shuffle_usernames(id: number): Promise<any> {
     return new Promise((resFunc, rejFunc) => {
       var toAddRef = this.RTDB.ref(`gameData/Empire/games/${id}/startRand`);
@@ -269,10 +265,10 @@ export class EmpireService implements OnDestroy {
             resFunc("Names shuffled");
           }
         });
-    });
-  }
-
-  set_state(id: number, state: GameState): Promise<any> {
+      });
+    }
+    
+    set_state(id: number, state: GameState): Promise<any> {
     return new Promise((resFunc, rejFunc) => {
       var toAddRef = this.RTDB.ref(`gameData/Empire/games/${id}/state`);
       toAddRef.set(state.state,
@@ -290,39 +286,43 @@ export class EmpireService implements OnDestroy {
             resFunc(`State Updated to ${state}`);
           }
         });
-    });
-  }
-
-  advance_state(id: number): Promise<any> {
-    return new Promise((resFunc, rejFunc) => {
-      this.getGameState(id).then((gameState) => {
-        switch (gameState.state) {
-          case (GameStateOption.acceptingUsers): {
-            this.set_state(id, new GameState(GameStateOption.playing))
+      });
+    }
+    
+    advance_state(id: number): Promise<any> {
+      return new Promise((resFunc, rejFunc) => {
+        this.getGameState(id).then((gameState) => {
+          switch (gameState.state) {
+            case (GameStateOption.acceptingUsers): {
+              this.set_state(id, new GameState(GameStateOption.playing))
               .then((result) => { resFunc(result) })
               .catch((error) => { rejFunc(error) })
               break;
           }
           case (GameStateOption.playing): {
             this.set_state(id, new GameState(GameStateOption.finished))
-              .then((result) => { resFunc(result) })
-              .catch((error) => { rejFunc(error) })
-              break;
+            .then((result) => { resFunc(result) })
+            .catch((error) => { rejFunc(error) })
+            break;
           }
           case (GameStateOption.finished): {
             rejFunc("The game could not be updated because it is already finished");
             break;
           }
-          default:{
+          default: {
             rejFunc("The state could not be updated.");
           }
         }
       })
     })
   }
-
-  getPlayersJoined(id:number):Observable<any>{
+  
+  getPlayersJoined(id: number): Observable<any> {
     var dbList = this.AngularDB.list(`gameData/Empire/games/${id}/usernames`);
     return dbList.valueChanges();
+  }
+
+  ngOnDestroy() {
+    this.gameStateListeners.killAll();
   }
 }
