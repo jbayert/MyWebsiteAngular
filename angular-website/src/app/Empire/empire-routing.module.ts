@@ -13,7 +13,8 @@ const routes: Routes = [
   { path: 'join', component: JoinGameComponent },
   { path: 'player', component: PlayerPageComponent},
   { path: 'createGame', component: CreateGameComponent},
-  { path: '', component: EmpireComponent }
+  { path: '', component: EmpireComponent },
+  { path: 'owner', loadChildren: () => import('./owner-module/owner-module.module').then(m => m.OwnerModuleModule) }
 ];
 
 @NgModule({
