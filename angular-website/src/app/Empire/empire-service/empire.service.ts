@@ -11,9 +11,11 @@ import { AngularFireDatabase } from '@angular/fire/database';
 import { EmpireConfig } from '../empire-config';
 
 import { AngularFireAuth } from '@angular/fire/auth';
+import { BehaviorSubject } from 'rxjs';
 
-import { GameState, UserProfile } from './empire-data.model';
+import { GameState, GameStateOption, UserProfile } from './empire-data.model';
 import { FormControl, AbstractControl, ValidationErrors } from '@angular/forms';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: EmpireServiceModule
@@ -21,10 +23,12 @@ import { FormControl, AbstractControl, ValidationErrors } from '@angular/forms';
 export class EmpireService implements OnDestroy {
   RTDB: firebase.database.Database;
   firebaseAuth: firebase.auth.Auth;
+  gameStateSubjects;
 
-  constructor(public auth: AngularFireAuth) {
+  constructor(private auth: AngularFireAuth, private AngularDB: AngularFireDatabase) {
     this.RTDB = firebase.database();
     this.firebaseAuth = firebase.auth();
+    this.gameStateSubjects = {};
   }
 
   /**
@@ -40,25 +44,59 @@ export class EmpireService implements OnDestroy {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
-  getResults(id: number) {
-    var dbList = `gameData/Empire/games/${id}/users`;
-
-  }
-
-  testGameState(id: number): Promise<GameState> {
+  /**
+   * returns id the game state 
+   * 
+   */
+  getGameState(id: number): Promise<GameState> {
     return new Promise((resolutionFunc, rejectionFunc) => {
-      this.RTDB.ref(`gameData/Empire/games/${id}/state`).once('value')
-        .then((dataSnapshot) => {
-          console.log("got Game State");
-          resolutionFunc(new GameState(dataSnapshot.val()))
-        }).catch((error) => {
-          rejectionFunc(error);
-        });
+      if (!(id in this.gameStateSubjects)) {
+        //pull data
+        this.RTDB.ref(`gameData/Empire/games/${id}/state`).once('value')
+          .then((dataSnapshot) => {
+            console.log("got Game State");
+            resolutionFunc(new GameState(dataSnapshot.val()))
+          }).catch((error) => {
+            rejectionFunc(error);
+          });
+      } else {
+        //already have the state
+        console.log("getting game data");
+        console.log(this.gameStateSubjects[id].getValue());
+        resolutionFunc(this.gameStateSubjects[id].getValue())
+      }
     })
   }
 
+  listenGameState(id: number): Observable<GameState | null> {
+    if (!(id in this.gameStateSubjects)) {
+      //new pull
+      this.gameStateSubjects[id] = {
+        subject: null,
+        onValueChange: null,
+        ref: null
+      }
+      this.gameStateSubjects[id].subject  = new BehaviorSubject<GameState | null>(null);
+      this.gameStateSubjects[id].ref = this.RTDB.ref(`gameData/Empire/games/${id}/state`);
+      this.gameStateSubjects[id].onValueChange = this.gameStateSubjects[id].ref.on('value', (dataSnapshot) => {
+        console.log("New value");
+        this.gameStateSubjects[id].subject.next(new GameState(dataSnapshot.val()));
+      });
+
+      return this.gameStateSubjects[id].subject.asObservable();
+    } else {
+      console.log("pulling stored again");
+      return this.gameStateSubjects[id].subject.asObservable();
+    }
+  }
+
+  /**
+   * creates a guest I
+   * @param length how many charecters the the Id should be
+   */
   private makeGuestId(length) {
     var result = 'guest_';
+    //which ids are used
     var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     var charactersLength = characters.length;
     for (var i = 0; i < length; i++) {
@@ -67,6 +105,9 @@ export class EmpireService implements OnDestroy {
     return result;
   }
 
+  /**
+   * 
+   */
   gameIdRangeValidator = (control: FormControl): ValidationErrors => {
     const gameID = parseInt(control.value, 10);
     const minID = EmpireConfig.gameIdRange.minID;//inclusive
@@ -88,7 +129,7 @@ export class EmpireService implements OnDestroy {
    */
   gameIdValidator = (control: AbstractControl): Promise<ValidationErrors | null> => {
     return new Promise((resolutionFunc, rejectionFunc) => {
-      this.testGameState(+control.value).then((gameState) => {
+      this.getGameState(+control.value).then((gameState) => {
         if (gameState.canJoin) {
           resolutionFunc(null);
         } else {
@@ -100,9 +141,13 @@ export class EmpireService implements OnDestroy {
     })
   }
 
+  /**
+   * Adds a users to the game
+   * @param newUser the user to be added  
+   * @param guestID 
+   */
   joinGame(newUser: UserProfile, guestID: boolean): Promise<any> {
     return new Promise((resFunc, rejFunc) => {
-      console.log("Joining", !guestID);
       if (!guestID) {
         var user = this.firebaseAuth.currentUser;
         if (user) {
@@ -113,7 +158,6 @@ export class EmpireService implements OnDestroy {
             username: newUser.username
           },
             (error) => {
-              console.log("Error", error);
               if (error) {
                 rejFunc(error);
               } else {
@@ -144,66 +188,141 @@ export class EmpireService implements OnDestroy {
     })
   }
 
-  createGame(timeoutMS:number = 5000,timeoutNum:number = 10): Promise<number|null> {
-    return new Promise((resFunc,rejFunction)=>{
-      if(timeoutNum<0){
-        rejFunction({reason: "Recursion Timeout." });
+  createGame(timeoutMS: number = 5000, timeoutNum: number = 10): Promise<number | null> {
+    return new Promise((resFunc, rejFunction) => {
+      if (timeoutNum < 0) {
+        rejFunction({ reason: "Recursion Timeout." });
       }
 
       //set up Timeout
       var timeoutPromis = setTimeout(() => {
-        rejFunction({reason: 'Timed out in '+ timeoutMS + 'ms.'});
+        rejFunction({ reason: 'Timed out in ' + timeoutMS + 'ms.' });
       }, timeoutMS)
-      
+
 
       var user = this.firebaseAuth.currentUser;
-      if (user){
-        var id = this.getRandomInt(EmpireConfig.gameIdRange.minID,EmpireConfig.gameIdRange.maxID);
+      if (user) {
+        var id = this.getRandomInt(EmpireConfig.gameIdRange.minID, EmpireConfig.gameIdRange.maxID);
 
         var testGameID = this.RTDB.ref(`gameData/Empire/games/${id}/roles`);
-        testGameID.transaction((currentData) =>{
-          if(currentData === null) {
+        testGameID.transaction((currentData) => {
+          if (currentData === null) {
             var data = {};
-            data[user.uid] = "owner"; 
+            data[user.uid] = "owner";
             return data;
           } else {
             return;
           }
-        },(error, committed, snapshot)=>{
+        }, (error, committed, snapshot) => {
           if (error) {
             //raise an error
             rejFunction(error);
-          }else if(committed){
+          } else if (committed) {
             //finish created the game
             var testGameID = this.RTDB.ref(`gameData/Empire/games/${id}/state`);
-            testGameID.set('accepting users').then((value)=>{
+            testGameID.set(GameStateOption.acceptingUsers).then((value) => {
               //add timestamp
               var testGameID = this.RTDB.ref(`gameData/Empire/games/${id}/timestamp`);
-              testGameID.set(new Date().getTime()).then((value)=>{
+              testGameID.set(new Date().getTime()).then((value) => {
+                //add state listener
+                this.listenGameState(id);
                 resFunc(id);
-              }).catch((state_error)=>{
-                rejFunction({reason: "Error Updating State",error: state_error})
+              }).catch((state_error) => {
+                rejFunction({ reason: "Error Updating State", error: state_error })
               });
-            }).catch((state_error)=>{
-              rejFunction({reason: "Error Updating State",error: state_error})
+            }).catch((state_error) => {
+              rejFunction({ reason: "Error Updating State", error: state_error })
             });
-          }else{
+          } else {
             //Id already taken
-            this.createGame(timeoutMS,timeoutNum-1).then((id)=>{
+            this.createGame(timeoutMS, timeoutNum - 1).then((id) => {
               resFunc(id);
-            }).catch((error)=>{
+            }).catch((error) => {
               rejFunction(error);
             })
           }
         })
-      }else{
+      } else {
         rejFunction("User Not Logged in");
       }
-     
+
     })
   }
 
   ngOnDestroy() {
+    for (var key of Object.keys(this.gameStateSubjects)) {
+      console.log(`Destroying ${key}`);
+      //remove the listeners
+      this.gameStateSubjects[key].ref.off('value', this.gameStateSubjects[key].onValueChange);
+    }
+  }
 
+  shuffle_usernames(id: number): Promise<any> {
+    return new Promise((resFunc, rejFunc) => {
+      var toAddRef = this.RTDB.ref(`gameData/Empire/games/${id}/startRand`);
+      toAddRef.set(true,
+        (error) => {
+          if (error) {
+            rejFunc(error);
+          } else {
+            console.log("Names Shuffled");
+            resFunc("Names shuffled");
+          }
+        });
+    });
+  }
+
+  set_state(id: number, state: GameState): Promise<any> {
+    return new Promise((resFunc, rejFunc) => {
+      var toAddRef = this.RTDB.ref(`gameData/Empire/games/${id}/state`);
+      toAddRef.set(state.state,
+        (error) => {
+          if (error) {
+            rejFunc(error);
+          } else {
+            if (state.state === GameStateOption.playing) {
+              this.shuffle_usernames(id).then(() => {
+                resFunc(`State Updated to ${state}`);
+              }).catch((error) => {
+                rejFunc(error);
+              })
+            }
+            resFunc(`State Updated to ${state}`);
+          }
+        });
+    });
+  }
+
+  advance_state(id: number): Promise<any> {
+    return new Promise((resFunc, rejFunc) => {
+      this.getGameState(id).then((gameState) => {
+        switch (gameState.state) {
+          case (GameStateOption.acceptingUsers): {
+            this.set_state(id, new GameState(GameStateOption.playing))
+              .then((result) => { resFunc(result) })
+              .catch((error) => { rejFunc(error) })
+              break;
+          }
+          case (GameStateOption.playing): {
+            this.set_state(id, new GameState(GameStateOption.finished))
+              .then((result) => { resFunc(result) })
+              .catch((error) => { rejFunc(error) })
+              break;
+          }
+          case (GameStateOption.finished): {
+            rejFunc("The game could not be updated because it is already finished");
+            break;
+          }
+          default:{
+            rejFunc("The state could not be updated.");
+          }
+        }
+      })
+    })
+  }
+
+  getPlayersJoined(id:number):Observable<any>{
+    var dbList = this.AngularDB.list(`gameData/Empire/games/${id}/usernames`);
+    return dbList.valueChanges();
   }
 }

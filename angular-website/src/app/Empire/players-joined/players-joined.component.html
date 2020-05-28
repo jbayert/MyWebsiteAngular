@@ -1,0 +1,15 @@
+<h1>Join the game at URL</h1><!--TODO: add URL -->
+<h2>Enter game code {{this.gameID}}</h2>
+
+
+<button (click) = startGame()>Start the Game</button>
+
+<h2>Players that have Joined</h2>
+
+<div class = "flex-container">
+  <div *ngFor="let item of items | async" class="card-hover">
+    <div class="container">
+      <h4><b>{{item.username}}</b></h4> 
+    </div>
+  </div>  
+</div>

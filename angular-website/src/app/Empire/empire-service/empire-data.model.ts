@@ -1,4 +1,16 @@
 
+
+
+/**
+ * the state machine for the game options
+ */
+export enum GameStateOption {
+    acceptingUsers="accepting users",
+    playing="playing" ,
+    finished="finished",
+}
+
+
 /**
  * The game state variable
  * 
@@ -11,20 +23,51 @@ export class GameState {
      * The options are 
      * accepting_users, playing, finished
      */
-    state: string;
+    state: GameStateOption;
     
     /**
      * whether a game is currently accepting users
      */
     get canJoin(): boolean {
-        return this.state === "accepting users";
+        return this.state === GameStateOption.acceptingUsers;
     }
+
+    get stateString():string|null  {
+        return <string> this.state;
+    }
+
+    setStatebyString(stateString:string):GameStateOption|null {
+        switch(stateString){
+            case "accepting users":{
+                this.state = GameStateOption.acceptingUsers
+                break;
+            }
+            case "playing":{
+                this.state = GameStateOption.playing;
+                break;
+            }
+            case "finished":{
+                this.state = GameStateOption.finished;
+                break;
+            }
+            default:{
+                return null;
+            }
+        }
+        return this.state;
+    }
+
 
     /**
      * 
+     * @param state 
      */
-    constructor(state: string){
-        this.state = state;
+    constructor(state: GameStateOption|string){
+        if (typeof state === "string" ){
+            this.setStatebyString(state);
+        }else{
+            this.state = state;
+        }
     }
 }
 

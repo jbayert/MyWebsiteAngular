@@ -15,7 +15,7 @@ export class JoinGameComponent implements OnInit {
   guestID: boolean;
 
   constructor(private empireService: EmpireService,
-              private route: ActivatedRoute) {
+    private route: ActivatedRoute) {
     console.log(empireService);
     this.test = 5;
   };
@@ -34,15 +34,15 @@ export class JoinGameComponent implements OnInit {
     });
 
     this.guestID = false;
-    this.route.queryParamMap.subscribe(queryParams  => {
+    this.route.queryParamMap.subscribe(queryParams => {
       console.log("Query")
-      console.log((!!queryParams.get("guestID"))&&(queryParams.get("guestID")!="false"))
-      
-      this.guestID = (!!queryParams.get("guestID"))&&(queryParams.get("guestID")!="false");
-      if (queryParams.get("gameID")){
-        this.form.get("gameID").setValue(+queryParams.get("gameID")); 
+      console.log((!!queryParams.get("guestID")) && (queryParams.get("guestID") != "false"))
+
+      this.guestID = (!!queryParams.get("guestID")) && (queryParams.get("guestID") != "false");
+      if (queryParams.get("gameID")) {
+        this.form.get("gameID").setValue(+queryParams.get("gameID"));
       }
-   });
+    });
   }
 
   onSubmit(gameToJoin) {
@@ -50,16 +50,16 @@ export class JoinGameComponent implements OnInit {
       gameToJoin.username,
       gameToJoin.codename,
       gameToJoin.gameID);
-    this.empireService.joinGame(newUser, this.guestID ).then((value) => {
+    this.empireService.joinGame(newUser, this.guestID).then((value) => {
       console.log(value);
     }).catch((error) => {
       console.log(error);
     });
   }
 
-  get submitBtnText():string{
-    if(!this.guestID){return "Join Game"}
-    else {return "Join as guest"}
+  get submitBtnText(): string {
+    if (!this.guestID) { return "Join Game" }
+    else { return "Join as guest" }
   }
 
 }
