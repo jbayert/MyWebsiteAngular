@@ -12,23 +12,23 @@ export class PlayerPageComponent implements OnInit, OnDestroy {
   gameStatusSub: Subscription;
 
   constructor(private empireService: EmpireService ) {
-    empireService.listenGameState(100);
-    this.gameStatusSub = empireService.listenGameState(100).subscribe({
-      next(x) { 
-        console.log(x);
-        this.gameState = x;
-      },
-      error(err) { console.error('something wrong occurred: ' + err); },
-      complete() { console.log('done'); }
-    });
-   }
+    empireService.listenGameState(100).then((listener)=>{
+      this.gameStatusSub = listener.subscribe({
+        next(x:GameState) { 
+          console.log(`The current state is ${x.state}`);
+          this.gameState = x;
+        },
+        error(err) { console.error('something wrong occurred: ' + err); },
+        complete() { console.log('done'); }
+      });
+    })
+    }
 
   ngOnInit(): void {
   }
 
   ngOnDestroy(): void {
     this.gameStatusSub.unsubscribe();
-    console.log("unsubscribe");
   }
 
 }
