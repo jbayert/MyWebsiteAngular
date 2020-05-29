@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+//TODO: remove
+
+import { Component, Input } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AngularFireDatabase } from '@angular/fire/database';
 import { ActivatedRoute } from '@angular/router';
@@ -17,7 +19,12 @@ export class EmpireListComponent{
     ];
 
     items: Observable<any[]>;
-    game_id;
+    
+    @Input()
+    set game_id(game_id:number){
+
+    }
+
     dbList;
     constructor(db: AngularFireDatabase,
         private activatedRoute: ActivatedRoute) {

@@ -1,2 +1,7 @@
-
 <p>owner-module works!</p>
+<div *ngIf = "this.states === this.stateOptions.acceptingUsers">
+    <app-players-joined></app-players-joined>
+</div>
+<h1>{{states}}</h1>
+<h1>{{test}}</h1>
+<mat-spinner [hidden] = "this.states !== 'loading'" ></mat-spinner>

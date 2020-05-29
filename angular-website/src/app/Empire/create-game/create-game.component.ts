@@ -10,20 +10,12 @@ import { Router, ActivatedRoute } from '@angular/router';
 export class CreateGameComponent implements OnInit {
 
   spinnerShown: boolean;
-  joinAlso: string;
-  canJoinOptions = {
-    yes:"Yes",
-    no:"No"
-  }
+
   options:string[];
 
   constructor(private empireService: EmpireService,
     private router:Router,
     private route:ActivatedRoute) {
-    this.options = [];
-    for(var key in this.canJoinOptions){
-      this.options.push(this.canJoinOptions[key]);
-    }
     this.spinnerShown = false;
    }
 
