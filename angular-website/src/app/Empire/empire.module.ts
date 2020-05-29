@@ -11,25 +11,23 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { environment } from 'src/environments/environment';
 
 
-import { EmpireListComponent } from './empire-list/empire-list.component';
 import { JoinGameComponent } from './join-game/join-game.component';
 import { CreateGameComponent } from './create-game/create-game.component';
 import { EmpireServiceModule } from './empire-service/empire-service.module';
 import { PlayerPageComponent } from '../empire/player-page/player-page.component';
 import { MonitorComponent } from './monitor/monitor.component';
 import { OwnerComponent } from './owner/owner.component';
-import { PlayersJoinedComponent } from './players-joined/players-joined.component'
+import { ListCodeNamesComponent } from './list-code-names/list-code-names.component'
 
 @NgModule({
   declarations: [
     EmpireComponent,
-    EmpireListComponent,
     JoinGameComponent,
     CreateGameComponent,
     PlayerPageComponent,
     MonitorComponent,
     OwnerComponent,
-    PlayersJoinedComponent
+    ListCodeNamesComponent
   ],
   imports: [
     EmpireServiceModule,

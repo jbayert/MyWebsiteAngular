@@ -1,17 +1,2 @@
-<h1>Create a game</h1>
-<div> Do you want to play also?</div>
-<mat-radio-group
-  aria-labelledby="radio-group-label"
-  class="radio-group"
-  [(ngModel)]="joinAlso">
-  <mat-radio-button class="example-radio-button" *ngFor="let option of this.options" [value]="option">
-    {{option}}
-  </mat-radio-button>
-</mat-radio-group>
-
-<div *ngIf = 'this.joinAlso === this.canJoinOptions.yes'>
-  Test
-</div>
-
 <button [disabled] = "spinnerShown" (click)="createGameCallback()">Create a Game</button>
 <mat-spinner [hidden] = "!spinnerShown" ></mat-spinner>

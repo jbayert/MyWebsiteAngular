@@ -5,7 +5,7 @@ import { EmpireListComponent } from './empire-list/empire-list.component';
 import { JoinGameComponent } from './join-game/join-game.component';
 import { PlayerPageComponent } from './player-page/player-page.component';
 import { CreateGameComponent } from './create-game/create-game.component'
-
+import { OwnerModuleComponent } from './owner-module/owner-module.component'
 import { EmpireComponent } from './empire-home/empire.component';
 
 const routes: Routes = [
@@ -13,8 +13,10 @@ const routes: Routes = [
   { path: 'join', component: JoinGameComponent },
   { path: 'player', component: PlayerPageComponent},
   { path: 'createGame', component: CreateGameComponent},
-  { path: '', component: EmpireComponent },
-  { path: 'owner', loadChildren: () => import('./owner-module/owner-module.module').then(m => m.OwnerModuleModule) }
+  { path: 'owner', 
+      loadChildren: () => import('./owner-module/owner-module.module').then(m => m.OwnerModuleModule),
+      component: OwnerModuleComponent },
+  { path: '', component: EmpireComponent }
 ];
 
 @NgModule({

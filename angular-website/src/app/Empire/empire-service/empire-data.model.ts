@@ -8,6 +8,7 @@ export enum GameStateOption {
     acceptingUsers="accepting users",
     playing="playing" ,
     finished="finished",
+    null="null"
 }
 
 
@@ -51,7 +52,7 @@ export class GameState {
                 break;
             }
             default:{
-                return null;
+                this.state = GameStateOption.null;
             }
         }
         return this.state;
@@ -65,6 +66,8 @@ export class GameState {
     constructor(state: GameStateOption|string){
         if (typeof state === "string" ){
             this.setStatebyString(state);
+        }else if (state===null){
+            this.state = GameStateOption.null;
         }else{
             this.state = state;
         }

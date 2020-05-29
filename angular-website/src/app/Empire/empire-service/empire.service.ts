@@ -78,8 +78,10 @@ export class EmpireService implements OnDestroy {
       var listener = this.gameStateListeners.getAsObservable(id);
       if (!listener) {
         //need to add it
-        await this.gameStateListeners.add(id);
-        resFunc(this.gameStateListeners.getAsObservable(id));
+        this.gameStateListeners.add(id).then(()=>{
+          var test = this.gameStateListeners.getAsObservable(id);
+          resFunc(test);
+        });
       } else {
         //already have the listener
         resFunc( listener);
@@ -321,6 +323,8 @@ export class EmpireService implements OnDestroy {
     var dbList = this.AngularDB.list(`gameData/Empire/games/${id}/usernames`);
     return dbList.valueChanges();
   }
+
+  
 
   ngOnDestroy() {
     this.gameStateListeners.killAll();

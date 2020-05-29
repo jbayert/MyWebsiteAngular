@@ -67,7 +67,7 @@ export class GameStateListeners {
     getAsObservable(id: number): Observable<GameState> {
         var curListener = this.getGameListener(id);
         if (curListener) {
-            curListener.getObservable();
+            return curListener.getObservable();
         } else {
             return null;
         }
