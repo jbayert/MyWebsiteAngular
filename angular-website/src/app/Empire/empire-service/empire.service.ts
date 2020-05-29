@@ -23,10 +23,15 @@ import { GameStateListeners } from './empire-game-listener.model';
   providedIn: EmpireServiceModule
 })
 export class EmpireService implements OnDestroy {
-  RTDB: firebase.database.Database;
-  firebaseAuth: firebase.auth.Auth;
-  gameStateListeners: GameStateListeners;
+  private RTDB: firebase.database.Database;
+  private firebaseAuth: firebase.auth.Auth;
+  private gameStateListeners: GameStateListeners;
 
+  /**
+   * 
+   * @param auth the auth service
+   * @param AngularDB the angular fire database that is sometimes used
+   */
   constructor(private auth: AngularFireAuth, private AngularDB: AngularFireDatabase) {
     this.RTDB = firebase.database();
     this.firebaseAuth = firebase.auth();
@@ -47,8 +52,9 @@ export class EmpireService implements OnDestroy {
   }
 
   /**
-   * returns id the game state 
+   * returns the game state 
    * 
+   * @param id the id to get the game state
    */
   getGameState(id: number): Promise<GameState> {
     return new Promise((resolutionFunc, rejectionFunc) => {
@@ -73,6 +79,10 @@ export class EmpireService implements OnDestroy {
     })
   }
 
+  /**
+   * returns an observable to listen to the game
+   * @param id the game id to listen to
+   */
   public listenGameState(id: number): Promise<Observable<GameState>> {
     return new Promise(async (resFunc, rejFunc) => {
       var listener = this.gameStateListeners.getAsObservable(id);
@@ -89,6 +99,11 @@ export class EmpireService implements OnDestroy {
     })
   }
 
+  /**
+   * stops listening to a game internally
+   * Note: you still have to unsubscribe
+   * @param id the game id to listen to
+   */
   public stopListeningToGameState(id: number){
     this.gameStateListeners.killListener(id);
   }
@@ -109,7 +124,9 @@ export class EmpireService implements OnDestroy {
   }
 
   /**
-   * 
+   * A validator to test if the id is valid
+   * this is an async validator
+   * @param control the formcontrol element
    */
   gameIdRangeValidator = (control: FormControl): ValidationErrors => {
     const gameID = parseInt(control.value, 10);
@@ -193,6 +210,14 @@ export class EmpireService implements OnDestroy {
     })
   }
 
+
+  //TODO: kill a promise
+  /**
+   * handles creating a game
+   * @param timeoutMS maximum about of time to try to create a game (in miliseconds)
+   * @param timeoutNum maximum number of inquies befor giving up
+   * @returns returns a promise of the game id 
+   */
   createGame(timeoutMS: number = 5000, timeoutNum: number = 10): Promise<number | null> {
     return new Promise((resFunc, rejFunction) => {
       if (timeoutNum < 0) {
@@ -254,7 +279,10 @@ export class EmpireService implements OnDestroy {
     })
   }
 
-  
+  /**
+   * tells the firebase to shuffle the usernames for a game
+   * @param id the gameID to shuffle
+   */
   shuffle_usernames(id: number): Promise<any> {
     return new Promise((resFunc, rejFunc) => {
       var toAddRef = this.RTDB.ref(`gameData/Empire/games/${id}/startRand`);
@@ -270,7 +298,14 @@ export class EmpireService implements OnDestroy {
       });
     }
     
-    set_state(id: number, state: GameState): Promise<any> {
+    //TODO: update this
+    /**
+     * sets the state of a game
+     * @param id the gameID to set the state
+     * @param state the state to set
+     * @returns
+     */
+    private set_state(id: number, state: GameState): Promise<any> {
     return new Promise((resFunc, rejFunc) => {
       var toAddRef = this.RTDB.ref(`gameData/Empire/games/${id}/state`);
       toAddRef.set(state.state,
@@ -284,13 +319,20 @@ export class EmpireService implements OnDestroy {
               }).catch((error) => {
                 rejFunc(error);
               })
+            }else{
+              resFunc(`State Updated to ${state}`);
             }
-            resFunc(`State Updated to ${state}`);
           }
         });
       });
     }
     
+    //TODO: return the current state
+    /**
+     * advances the state of the game
+     * @param id the 
+     * @returns
+     */
     advance_state(id: number): Promise<any> {
       return new Promise((resFunc, rejFunc) => {
         this.getGameState(id).then((gameState) => {
@@ -318,14 +360,21 @@ export class EmpireService implements OnDestroy {
       })
     })
   }
-  
+
+  /**
+   * listen to the player that have joined the game
+   * @param id the gameID to listen to
+   * @returns an obsevable of the list of players that have joined
+   */
   getPlayersJoined(id: number): Observable<any> {
     var dbList = this.AngularDB.list(`gameData/Empire/games/${id}/usernames`);
     return dbList.valueChanges();
   }
 
   
-
+  /**
+   * 
+   */
   ngOnDestroy() {
     this.gameStateListeners.killAll();
   }
