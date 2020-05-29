@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AngularFireDatabase, AngularFireList } from '@angular/fire/database';
 import { Observable } from 'rxjs';
@@ -11,23 +11,24 @@ import { GameState, GameStateOption } from '../empire-service/empire-data.model'
   styleUrls: ['./players-joined.component.scss']
 })
 export class PlayersJoinedComponent implements OnInit {
-  gameID: number;
+  curGameID:number;
+  
+  @Input()
+  set gameID(gameID: number){
+    this.curGameID =  gameID;
+    this.items = this.empireService.getPlayersJoined(this.curGameID);
+  };
   items: Observable<any[]>;
 
   constructor(
     private route: ActivatedRoute,
     private empireService: EmpireService
   ) {
-    
-   }
+    this.curGameID = null;
+  }
 
   ngOnInit(): void {
-    this.route.queryParamMap.subscribe(queryParams => {
-      if (queryParams.get("gameID")) {
-        this.gameID = +queryParams.get("gameID");
-        this.items = this.empireService.getPlayersJoined(this.gameID);
-      }
-    });
+
   }
 
   startGame(){
