@@ -1,7 +1,9 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { EmpireService } from '../empire-service/empire.service';
+import { ActivatedRoute } from '@angular/router';
 import { GameStateOption, GameState } from '../empire-service/empire-data.model';
-import { Observable,Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
+
 
 @Component({
   selector: 'app-owner',
@@ -9,36 +11,63 @@ import { Observable,Subscription } from 'rxjs';
   styleUrls: ['./owner-module.component.scss']
 })
 export class OwnerModuleComponent implements OnInit, OnDestroy {
-  states: any;
+  displayState: any;
+
   stateObservable: Observable<GameState>;
   stateSubscription: Subscription;
   stateOptions = GameStateOption;
-  test:any;
 
-  constructor(private empireService: EmpireService) {
-    this.states = 'loading';
-    this.empireService.listenGameState(100).then((observe)=>{
-      observe.subscribe((gameState)=>{
-        console.log(this.states)
-        if(!!gameState){
-          this.setState(gameState.state);
-          this.states = gameState.state;
-          console.log(this.states === this.stateOptions.acceptingUsers);
-        }
-        console.log(this.states)
-      })
-    }).catch(()=>{})
+  private _gameID: number;
+  get gameID(): number {
+    return this._gameID;
+  };
+
+  set gameID(theGameID: number) {
+    if (this._gameID) {
+      this.empireService.stopListeningToGameState(this._gameID);
+    }
+
+    this.empireService.listenGameState(this.gameID).then(async (observe) => {
+      try {
+        this.stateSubscription = await observe.subscribe();
+        this.stateSubscription = observe.subscribe((gameState) => {
+          if (!!gameState) {
+            this.displayState = gameState.state;
+          } else {
+
+          }
+          this.changeDetector.detectChanges();
+        })
+      } catch (error) {
+      }
+    }).catch(() => {
+
+    })
+
+    this._gameID = theGameID;
+    console.log(this._gameID);
   }
 
-  setState(state:any){
-    this.states = state
-    console.log(this.states)
+  constructor(private empireService: EmpireService,
+    private changeDetector: ChangeDetectorRef,
+    private route: ActivatedRoute) {
+    this.displayState = 'loading';
   }
 
   ngOnInit(): void {
+    this.route.queryParamMap.subscribe((queryParams) => {
+      if (queryParams.get("gameID")) {
+        this.gameID = +queryParams.get("gameID");
+      }
+    });
   }
 
-  ngOnDestroy():void {
-    if(this.stateSubscription){this.stateSubscription.unsubscribe()}
+  btn() {
+    console.log("Hi")
+  }
+
+
+  ngOnDestroy(): void {
+    if (this.stateSubscription) { this.stateSubscription.unsubscribe() }
   }
 }
