@@ -14,8 +14,7 @@ export class CreateGameComponent implements OnInit {
   options:string[];
 
   constructor(private empireService: EmpireService,
-    private router:Router,
-    private route:ActivatedRoute) {
+    private router:Router) {
     this.spinnerShown = false;
    }
 
@@ -26,7 +25,7 @@ export class CreateGameComponent implements OnInit {
     this.spinnerShown = true;
     this.empireService.createGame().then((id)=>{
       console.log(id);
-      this.router.navigate(['../players-joined'], { relativeTo: this.route, queryParams: {gameID: id }})
+      this.router.navigate(['empire/owner'], { queryParams: {gameID: id }})
     }).catch((error)=>{
       console.log(error);
       this.spinnerShown = false;

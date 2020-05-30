@@ -28,7 +28,6 @@ export class OwnerModuleComponent implements OnInit, OnDestroy {
       this.empireService.stopListeningToGameState(this._gameID);
     }
 
-    console.log(theGameID);
     if (theGameID>0) {
       this.empireService.listenGameState(theGameID).then(async (observe) => {
         try {
@@ -50,7 +49,6 @@ export class OwnerModuleComponent implements OnInit, OnDestroy {
     }
 
     this._gameID = theGameID;
-    console.log(this._gameID);
   }
 
   constructor(private empireService: EmpireService,
