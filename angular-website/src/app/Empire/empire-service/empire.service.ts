@@ -57,26 +57,32 @@ export class EmpireService implements OnDestroy {
    * @param id the id to get the game state
    */
   getGameState(id: number): Promise<GameState> {
-    return new Promise((resolutionFunc, rejectionFunc) => {
-      var listener = this.gameStateListeners.getAsObservable(id);
-      if (!listener) {
-        //pull data
-        this.RTDB.ref(`gameData/Empire/games/${id}/state`).once('value')
-          .then((dataSnapshot) => {
-            console.log("got Game State");
-            resolutionFunc(new GameState(dataSnapshot.val()))
-          }).catch((error) => {
-            rejectionFunc(error);
-          });
-      } else {
-        //already have the state
-        listener.pipe(first())
-        .subscribe((gameState)=>{
-          resolutionFunc(gameState);
+    if (!id) {
+      return Promise.reject("Null id is not assignable");
+    } else {
+      return new Promise((resolutionFunc, rejectionFunc) => {
+        var listener = this.gameStateListeners.getAsObservable(id);
+        console.log(listener);
+        if (!listener) {
+          //pull data
+          this.RTDB.ref(`gameData/Empire/games/${id}/state`).once('value')
+            .then((dataSnapshot) => {
+              console.log("got Game State");
+              resolutionFunc(new GameState(dataSnapshot.val()))
+            }).catch((error) => {
+              rejectionFunc(error);
+            });
+        } else {
+          //already have the state
+          listener.pipe(first())
+            .subscribe((gameState) => {
+              resolutionFunc(gameState);
+            }
+            );
         }
-        );
-      }
-    })
+      })
+    }
+
   }
 
   /**
@@ -84,20 +90,20 @@ export class EmpireService implements OnDestroy {
    * @param id the game id to listen to
    */
   public listenGameState(id: number): Promise<Observable<GameState>> {
-    if (!id){
+    if (!id) {
       return Promise.reject("Null id is not assignable");
-    }else{
+    } else {
       return new Promise(async (resFunc, rejFunc) => {
         var listener = this.gameStateListeners.getAsObservable(id);
         if (!listener) {
           //need to add it
-          this.gameStateListeners.add(id).then(()=>{
+          this.gameStateListeners.add(id).then(() => {
             var test = this.gameStateListeners.getAsObservable(id);
             resFunc(test);
           });
         } else {
           //already have the listener
-          resFunc( listener);
+          resFunc(listener);
         }
       })
     }
@@ -108,8 +114,12 @@ export class EmpireService implements OnDestroy {
    * Note: you still have to unsubscribe
    * @param id the game id to listen to
    */
-  public stopListeningToGameState(id: number){
-    this.gameStateListeners.killListener(id);
+  public stopListeningToGameState(id: number) {
+    if (!id) {
+      return Promise.reject("Null id is not assignable");
+    } else {
+      this.gameStateListeners.killListener(id);
+    }
   }
 
   /**
@@ -153,7 +163,7 @@ export class EmpireService implements OnDestroy {
    */
   gameIdValidator = (control: AbstractControl): Promise<ValidationErrors | null> => {
     return new Promise(async (resolutionFunc, rejectionFunc) => {
-      try{
+      try {
         var gameState = await this.getGameState(+control.value);
         if (gameState.canJoin) {
           resolutionFunc(null);
@@ -161,7 +171,7 @@ export class EmpireService implements OnDestroy {
           resolutionFunc({ invalidID: "Invalid Game ID" });
         }
       }
-      catch(error) {
+      catch (error) {
         resolutionFunc({ invalidID: "Invalid Game ID" });
       }
     })
@@ -222,7 +232,7 @@ export class EmpireService implements OnDestroy {
    * @param timeoutNum maximum number of inquies befor giving up
    * @returns returns a promise of the game id 
    */
-  createGame(timeoutMS: number = 5000, timeoutNum: number = 10): Promise<number | null> {
+  createGame(timeoutMS: number = 10000, timeoutNum: number = 10): Promise<number | null> {
     return new Promise((resFunc, rejFunction) => {
       if (timeoutNum < 0) {
         rejFunction({ reason: "Recursion Timeout." });
@@ -288,81 +298,101 @@ export class EmpireService implements OnDestroy {
    * @param id the gameID to shuffle
    */
   shuffle_usernames(id: number): Promise<any> {
-    return new Promise((resFunc, rejFunc) => {
-      var toAddRef = this.RTDB.ref(`gameData/Empire/games/${id}/startRand`);
-      toAddRef.set(true,
-        (error) => {
-          if (error) {
-            rejFunc(error);
-          } else {
-            console.log("Names Shuffled");
-            resFunc("Names shuffled");
-          }
-        });
-      });
-    }
-    
-    //TODO: update this
-    /**
-     * sets the state of a game
-     * @param id the gameID to set the state
-     * @param state the state to set
-     * @returns
-     */
-    private set_state(id: number, state: GameState): Promise<any> {
-    return new Promise((resFunc, rejFunc) => {
-      var toAddRef = this.RTDB.ref(`gameData/Empire/games/${id}/state`);
-      toAddRef.set(state.state,
-        (error) => {
-          if (error) {
-            rejFunc(error);
-          } else {
-            if (state.state === GameStateOption.playing) {
-              this.shuffle_usernames(id).then(() => {
-                resFunc(`State Updated to ${state}`);
-              }).catch((error) => {
-                rejFunc(error);
-              })
-            }else{
-              resFunc(`State Updated to ${state}`);
+    if (!id) {
+      return Promise.reject("Null id is not assignable");
+    } else {
+
+      return new Promise((resFunc, rejFunc) => {
+        var toAddRef = this.RTDB.ref(`gameData/Empire/games/${id}/startRand`);
+        toAddRef.set(true,
+          (error) => {
+            if (error) {
+              rejFunc(error);
+            } else {
+              console.log("Names Shuffled");
+              resFunc("Names shuffled");
             }
-          }
-        });
+          });
       });
     }
-    
-    //TODO: return the current state
-    /**
-     * advances the state of the game
-     * @param id the 
-     * @returns
-     */
-    advance_state(id: number): Promise<any> {
+  }
+
+  /**
+   * sets the state of a game
+   * @param id the gameID to set the state
+   * @param state the state to set
+   * @returns
+   */
+  private setState(id: number, state: GameState): Promise<any> {
+    if (!id) {
+      return Promise.reject("Null id is not assignable");
+    } else {
+      return new Promise((resFunc, rejFunc) => {
+        var toAddRef = this.RTDB.ref(`gameData/Empire/games/${id}/state`);
+        toAddRef.set(state.state,
+          (error) => {
+            if (error) {
+              rejFunc(error);
+            } else {
+              if (state.state === GameStateOption.playing) {
+                this.shuffle_usernames(id).then(() => {
+                  resFunc({
+                    newState: state,
+                    message: `State Updated to ${state}`
+                  });
+                }).catch((error) => {
+                  rejFunc(error);
+                })
+              } else {
+                resFunc({
+                  newState: state,
+                  message: `State Updated to ${state}`
+                });
+              }
+            }
+          });
+      });
+    }
+  }
+
+  //TODO: return the current state
+  /**
+   * advances the state of the game
+   * @param id the 
+   * @returns
+   */
+  advanceState(id: number): Promise<any> {
+    if (!id){
+      return Promise.reject("Null id is not assignable");
+    }else{
       return new Promise((resFunc, rejFunc) => {
         this.getGameState(id).then((gameState) => {
           switch (gameState.state) {
             case (GameStateOption.acceptingUsers): {
-              this.set_state(id, new GameState(GameStateOption.playing))
-              .then((result) => { resFunc(result) })
-              .catch((error) => { rejFunc(error) })
+              this.setState(id, new GameState(GameStateOption.playing))
+                .then((result) => { resFunc(result) })
+                .catch((error) => { rejFunc(error) })
               break;
+            }
+            case (GameStateOption.playing): {
+              this.setState(id, new GameState(GameStateOption.finished))
+                .then((result) => { resFunc(result) })
+                .catch((error) => { rejFunc(error) })
+              break;
+            }
+            case (GameStateOption.finished): {
+              rejFunc("The game could not be updated because it is already finished");
+              break;
+            }
+            default: {
+              rejFunc("The state could not be updated.");
+            }
           }
-          case (GameStateOption.playing): {
-            this.set_state(id, new GameState(GameStateOption.finished))
-            .then((result) => { resFunc(result) })
-            .catch((error) => { rejFunc(error) })
-            break;
-          }
-          case (GameStateOption.finished): {
-            rejFunc("The game could not be updated because it is already finished");
-            break;
-          }
-          default: {
-            rejFunc("The state could not be updated.");
-          }
-        }
+        }).catch((error) => {
+          console.log(error);
+        })
       })
-    })
+    }
   }
 
   /**
@@ -371,11 +401,15 @@ export class EmpireService implements OnDestroy {
    * @returns an obsevable of the list of players that have joined
    */
   getPlayersJoined(id: number): Observable<any> {
-    var dbList = this.AngularDB.list(`gameData/Empire/games/${id}/usernames`);
-    return dbList.valueChanges();
+    if (!id){
+      return null;
+    }else{
+      var dbList = this.AngularDB.list(`gameData/Empire/games/${id}/usernames`);
+      return dbList.valueChanges();
+    }
   }
 
-  
+
   /**
    * 
    */

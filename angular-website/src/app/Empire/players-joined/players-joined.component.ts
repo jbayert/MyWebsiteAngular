@@ -32,7 +32,8 @@ export class PlayersJoinedComponent implements OnInit {
   }
 
   startGame(){
-    this.empireService.advance_state(this.gameID);
+    this.empireService.advanceState(this.curGameID).then(()=>{})
+    .catch((error)=>console.log(error));
   }
 
 }
