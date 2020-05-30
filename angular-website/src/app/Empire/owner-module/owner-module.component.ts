@@ -12,6 +12,7 @@ import { Observable, Subscription } from 'rxjs';
 })
 export class OwnerModuleComponent implements OnInit, OnDestroy {
   displayState: any;
+  gameState:GameState;
 
   stateObservable: Observable<GameState>;
   stateSubscription: Subscription;
@@ -27,22 +28,26 @@ export class OwnerModuleComponent implements OnInit, OnDestroy {
       this.empireService.stopListeningToGameState(this._gameID);
     }
 
-    this.empireService.listenGameState(this.gameID).then(async (observe) => {
-      try {
-        this.stateSubscription = await observe.subscribe();
-        this.stateSubscription = observe.subscribe((gameState) => {
-          if (!!gameState) {
-            this.displayState = gameState.state;
-          } else {
-
-          }
-          this.changeDetector.detectChanges();
-        })
-      } catch (error) {
-      }
-    }).catch(() => {
-
-    })
+    console.log(theGameID);
+    if (theGameID>0) {
+      this.empireService.listenGameState(theGameID).then(async (observe) => {
+        try {
+          this.stateSubscription = await observe.subscribe();
+          this.stateSubscription = observe.subscribe((gameState:GameState) => {
+            if (!!gameState) {
+              this.displayState = gameState.state;
+              this.gameState = gameState;
+            } else {
+  
+            }
+            this.changeDetector.detectChanges();
+          })
+        } catch (error) {
+        }
+      }).catch(() => {
+  
+      })
+    }
 
     this._gameID = theGameID;
     console.log(this._gameID);
@@ -61,11 +66,6 @@ export class OwnerModuleComponent implements OnInit, OnDestroy {
       }
     });
   }
-
-  btn() {
-    console.log("Hi")
-  }
-
 
   ngOnDestroy(): void {
     if (this.stateSubscription) { this.stateSubscription.unsubscribe() }

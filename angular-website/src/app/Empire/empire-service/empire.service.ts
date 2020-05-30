@@ -84,19 +84,23 @@ export class EmpireService implements OnDestroy {
    * @param id the game id to listen to
    */
   public listenGameState(id: number): Promise<Observable<GameState>> {
-    return new Promise(async (resFunc, rejFunc) => {
-      var listener = this.gameStateListeners.getAsObservable(id);
-      if (!listener) {
-        //need to add it
-        this.gameStateListeners.add(id).then(()=>{
-          var test = this.gameStateListeners.getAsObservable(id);
-          resFunc(test);
-        });
-      } else {
-        //already have the listener
-        resFunc( listener);
-      }
-    })
+    if (!id){
+      return Promise.reject("Null id is not assignable");
+    }else{
+      return new Promise(async (resFunc, rejFunc) => {
+        var listener = this.gameStateListeners.getAsObservable(id);
+        if (!listener) {
+          //need to add it
+          this.gameStateListeners.add(id).then(()=>{
+            var test = this.gameStateListeners.getAsObservable(id);
+            resFunc(test);
+          });
+        } else {
+          //already have the listener
+          resFunc( listener);
+        }
+      })
+    }
   }
 
   /**
