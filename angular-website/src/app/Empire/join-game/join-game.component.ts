@@ -13,11 +13,13 @@ export class JoinGameComponent implements OnInit {
   form: FormGroup;
   test: any;
   guestID: boolean;
+  submitEnabled: boolean;
 
   constructor(private empireService: EmpireService,
     private route: ActivatedRoute) {
     console.log(empireService);
     this.test = 5;
+    this.submitEnabled = true;
   };
 
   ngOnInit() {
@@ -50,10 +52,17 @@ export class JoinGameComponent implements OnInit {
       gameToJoin.username,
       gameToJoin.codename,
       gameToJoin.gameID);
+    this.submitEnabled = false;
     this.empireService.joinGame(newUser, this.guestID).then((value) => {
       console.log(value);
+      this.form.get('username').setValue('');
+      this.form.get('codename').setValue('');
+      this.form.get('username').markAsPristine();
+      this.form.get('codename').markAsPristine();
+      this.submitEnabled = true;
     }).catch((error) => {
       console.log(error);
+      this.submitEnabled = true;
     });
   }
 
