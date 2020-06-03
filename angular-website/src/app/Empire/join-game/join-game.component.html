@@ -50,7 +50,9 @@
     </div>
 
 
-    <button type="submit" [disabled] = "!form.valid">
+    <button type="submit" [disabled] = "!(form.valid && this.submitEnabled)">
         {{this.submitBtnText}}
     </button>
+
+    <mat-spinner [hidden] = "this.submitEnabled" ></mat-spinner>
   </form>

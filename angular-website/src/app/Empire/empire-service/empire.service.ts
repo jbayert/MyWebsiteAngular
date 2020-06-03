@@ -11,7 +11,7 @@ import { AngularFireDatabase } from '@angular/fire/database';
 import { EmpireConfig } from '../empire-config';
 
 import { AngularFireAuth } from '@angular/fire/auth';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subscription } from 'rxjs';
 import { first } from 'rxjs/operators'
 
 import { GameState, GameStateOption, UserProfile } from './empire-data.model';
@@ -62,7 +62,6 @@ export class EmpireService implements OnDestroy {
     } else {
       return new Promise((resolutionFunc, rejectionFunc) => {
         var listener = this.gameStateListeners.getAsObservable(id);
-        console.log(listener);
         if (!listener) {
           //pull data
           this.RTDB.ref(`gameData/Empire/games/${id}/state`).once('value')
@@ -297,7 +296,7 @@ export class EmpireService implements OnDestroy {
    * tells the firebase to shuffle the usernames for a game
    * @param id the gameID to shuffle
    */
-  shuffle_usernames(id: number): Promise<any> {
+  shuffleUsernames(id: number): Promise<any> {
     if (!id) {
       return Promise.reject("Null id is not assignable");
     } else {
@@ -309,8 +308,7 @@ export class EmpireService implements OnDestroy {
             if (error) {
               rejFunc(error);
             } else {
-              console.log("Names Shuffled");
-              resFunc("Names shuffled");
+              resFunc("Shuffled Started");
             }
           });
       });
@@ -335,7 +333,7 @@ export class EmpireService implements OnDestroy {
               rejFunc(error);
             } else {
               if (state.state === GameStateOption.playing) {
-                this.shuffle_usernames(id).then(() => {
+                this.shuffleUsernames(id).then(() => {
                   resFunc({
                     newState: state,
                     message: `State Updated to ${state}`
@@ -362,9 +360,9 @@ export class EmpireService implements OnDestroy {
    * @returns
    */
   advanceState(id: number): Promise<any> {
-    if (!id){
+    if (!id) {
       return Promise.reject("Null id is not assignable");
-    }else{
+    } else {
       return new Promise((resFunc, rejFunc) => {
         this.getGameState(id).then((gameState) => {
           switch (gameState.state) {
@@ -401,19 +399,45 @@ export class EmpireService implements OnDestroy {
    * @returns an obsevable of the list of players that have joined
    */
   getPlayersJoined(id: number): Observable<any> {
-    if (!id){
+    if (!id) {
       return null;
-    }else{
+    } else {
       var dbList = this.AngularDB.list(`gameData/Empire/games/${id}/usernames`);
       return dbList.valueChanges();
     }
   }
 
+  getCodenameSubscriber: Subscription;
+  /**
+   * returns the codenames that have joined
+   */
+  getCodename(id: number): Promise<any> {
+    if (!id) {
+      return Promise.reject("Null is not a valid id");
+    } else {
+      return new Promise((resFunc, rejFunc) => {
+        this.getCodenameSubscriber = this.AngularDB.object(`gameData/Empire/games/${id}/startRand`).snapshotChanges().subscribe(action => {
+          if (action.payload.val()==='finished'){
+            var ref = this.RTDB.ref(`gameData/Empire/games/${id}/codenames`);
+            ref.once('value')
+              .then(function (dataSnapshot) {
+                // handle read data.
+                resFunc(dataSnapshot.val());
+              }).catch((error) => {
+                rejFunc(error);
+              });
+            this.getCodenameSubscriber.unsubscribe();
+          }
+        });
+      })
+    }
+  }
 
   /**
    * 
    */
   ngOnDestroy() {
     this.gameStateListeners.killAll();
+    this.getCodenameSubscriber.unsubscribe();
   }
 }

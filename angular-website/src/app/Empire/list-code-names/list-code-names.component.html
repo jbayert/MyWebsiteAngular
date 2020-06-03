@@ -1,1 +1,4 @@
-<p>list-code-names works!</p>
+<button [hidden] = "!startButtonShown" (click)=startBtn()>Start Listing codename</button>
+<mat-spinner [hidden] = "!spinnerShown" ></mat-spinner>
+<h1>{{nameShown}}</h1>
+<button (click)=finishGameBtn()>Finish Game</button>

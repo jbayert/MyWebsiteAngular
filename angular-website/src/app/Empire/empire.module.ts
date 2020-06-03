@@ -17,7 +17,7 @@ import { EmpireServiceModule } from './empire-service/empire-service.module';
 import { PlayerPageComponent } from '../empire/player-page/player-page.component';
 import { MonitorComponent } from './monitor/monitor.component';
 import { OwnerComponent } from './owner/owner.component';
-import { ListCodeNamesComponent } from './list-code-names/list-code-names.component'
+import { ListResultsComponent } from './list-results/list-results.component';
 
 @NgModule({
   declarations: [
@@ -27,7 +27,7 @@ import { ListCodeNamesComponent } from './list-code-names/list-code-names.compon
     PlayerPageComponent,
     MonitorComponent,
     OwnerComponent,
-    ListCodeNamesComponent
+    ListResultsComponent
   ],
   imports: [
     EmpireServiceModule,
@@ -40,6 +40,6 @@ import { ListCodeNamesComponent } from './list-code-names/list-code-names.compon
     MatProgressSpinnerModule
   ],
   providers: [],
-  bootstrap: [EmpireComponent]
+  bootstrap: [EmpireComponent],
 })
 export class EmpireModule { }
