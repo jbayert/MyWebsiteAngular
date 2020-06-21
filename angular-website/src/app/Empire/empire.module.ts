@@ -17,7 +17,6 @@ import { EmpireServiceModule } from './empire-service/empire-service.module';
 import { PlayerPageComponent } from '../empire/player-page/player-page.component';
 import { MonitorComponent } from './monitor/monitor.component';
 import { OwnerComponent } from './owner/owner.component';
-import { ListResultsComponent } from './list-results/list-results.component';
 
 @NgModule({
   declarations: [
@@ -27,7 +26,6 @@ import { ListResultsComponent } from './list-results/list-results.component';
     PlayerPageComponent,
     MonitorComponent,
     OwnerComponent,
-    ListResultsComponent
   ],
   imports: [
     EmpireServiceModule,
@@ -41,5 +39,7 @@ import { ListResultsComponent } from './list-results/list-results.component';
   ],
   providers: [],
   bootstrap: [EmpireComponent],
+  exports:[
+  ],
 })
 export class EmpireModule { }

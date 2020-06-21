@@ -14,7 +14,6 @@ export class OwnerModuleComponent implements OnInit, OnDestroy {
   displayState: any;
   gameState:GameState;
 
-  stateObservable: Observable<GameState>;
   stateSubscription: Subscription;
   stateOptions = GameStateOption;
 
@@ -27,28 +26,9 @@ export class OwnerModuleComponent implements OnInit, OnDestroy {
     if (this._gameID) {
       this.empireService.stopListeningToGameState(this._gameID);
     }
-
-    if (theGameID>0) {
-      this.empireService.listenGameState(theGameID).then(async (observe) => {
-        try {
-          this.stateSubscription = await observe.subscribe();
-          this.stateSubscription = observe.subscribe((gameState:GameState) => {
-            if (!!gameState) {
-              this.displayState = gameState.state;
-              this.gameState = gameState;
-            } else {
-  
-            }
-            this.changeDetector.detectChanges();
-          })
-        } catch (error) {
-        }
-      }).catch(() => {
-  
-      })
-    }
-
+    
     this._gameID = theGameID;
+    this.updateGameStateListener();
   }
 
   constructor(private empireService: EmpireService,
@@ -63,6 +43,32 @@ export class OwnerModuleComponent implements OnInit, OnDestroy {
         this.gameID = +queryParams.get("gameID");
       }
     });
+  }
+
+
+  async updateGameStateListener(){
+    try {
+      if (this.stateSubscription){
+        this.stateSubscription.unsubscribe();
+        this.stateSubscription = null;
+      }
+      if (this._gameID >0){
+        let listener = await this.empireService.listenGameState(this._gameID);
+        this.stateSubscription = listener.subscribe((gameState:GameState) => {
+          if (!!gameState) {
+            this.displayState = gameState.state;
+            this.gameState = gameState;
+          } else {
+  
+          }
+          this.changeDetector.detectChanges();
+        })
+      }else{
+        this.changeDetector.detectChanges();
+      }
+    }catch(error){
+      console.log(error);
+    }
   }
 
   ngOnDestroy(): void {

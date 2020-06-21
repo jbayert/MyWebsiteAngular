@@ -11,13 +11,14 @@ import { AngularFireDatabase } from '@angular/fire/database';
 import { EmpireConfig } from '../empire-config';
 
 import { AngularFireAuth } from '@angular/fire/auth';
-import { BehaviorSubject, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { first } from 'rxjs/operators'
 
 import { GameState, GameStateOption, UserProfile } from './empire-data.model';
 import { FormControl, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { GameStateListeners } from './empire-game-listener.model';
+import { async } from '@angular/core/testing';
 
 @Injectable({
   providedIn: EmpireServiceModule
@@ -25,7 +26,7 @@ import { GameStateListeners } from './empire-game-listener.model';
 export class EmpireService implements OnDestroy {
   private RTDB: firebase.database.Database;
   private firebaseAuth: firebase.auth.Auth;
-  private gameStateListeners: GameStateListeners;
+  private _gameStateListeners: GameStateListeners;
 
   /**
    * 
@@ -35,7 +36,7 @@ export class EmpireService implements OnDestroy {
   constructor(private auth: AngularFireAuth, private AngularDB: AngularFireDatabase) {
     this.RTDB = firebase.database();
     this.firebaseAuth = firebase.auth();
-    this.gameStateListeners = new GameStateListeners(this.RTDB);
+    this._gameStateListeners = new GameStateListeners(this.RTDB);
   }
 
   /**
@@ -45,7 +46,7 @@ export class EmpireService implements OnDestroy {
  * lower than max if max isn't an integer).
  * Using Math.round() will give you a non-uniform distribution!
  */
-  getRandomInt(min, max) {
+  private _getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -61,7 +62,7 @@ export class EmpireService implements OnDestroy {
       return Promise.reject("Null id is not assignable");
     } else {
       return new Promise((resolutionFunc, rejectionFunc) => {
-        var listener = this.gameStateListeners.getAsObservable(id);
+        var listener = this._gameStateListeners.getAsObservable(id);
         if (!listener) {
           //pull data
           this.RTDB.ref(`gameData/Empire/games/${id}/state`).once('value')
@@ -85,7 +86,7 @@ export class EmpireService implements OnDestroy {
   }
 
   /**
-   * returns an observable to listen to the game
+   * returns an observable to listen to the game state
    * @param id the game id to listen to
    */
   public listenGameState(id: number): Promise<Observable<GameState>> {
@@ -93,11 +94,11 @@ export class EmpireService implements OnDestroy {
       return Promise.reject("Null id is not assignable");
     } else {
       return new Promise(async (resFunc, rejFunc) => {
-        var listener = this.gameStateListeners.getAsObservable(id);
+        var listener = this._gameStateListeners.getAsObservable(id);
         if (!listener) {
           //need to add it
-          this.gameStateListeners.add(id).then(() => {
-            var test = this.gameStateListeners.getAsObservable(id);
+          this._gameStateListeners.add(id).then(() => {
+            var test = this._gameStateListeners.getAsObservable(id);
             resFunc(test);
           });
         } else {
@@ -117,15 +118,15 @@ export class EmpireService implements OnDestroy {
     if (!id) {
       return Promise.reject("Null id is not assignable");
     } else {
-      this.gameStateListeners.killListener(id);
+      this._gameStateListeners.killListener(id);
     }
   }
 
   /**
-   * creates a guest I
+   * creates a random guest ID
    * @param length how many charecters the the Id should be
    */
-  private makeGuestId(length) {
+  private __makeGuestId(length) {
     var result = 'guest_';
     //which ids are used
     var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -204,7 +205,7 @@ export class EmpireService implements OnDestroy {
           rejFunc("No User Signed In");
         }
       } else {
-        var id = this.makeGuestId(8);
+        var id = this.__makeGuestId(8);
         console.log(id);
         //there is a user logged in
         var toAddRed = this.RTDB.ref(`gameData/Empire/games/${newUser.gameID}/guests/${id}`);
@@ -245,7 +246,7 @@ export class EmpireService implements OnDestroy {
 
       var user = this.firebaseAuth.currentUser;
       if (user) {
-        var id = this.getRandomInt(EmpireConfig.gameIdRange.minID, EmpireConfig.gameIdRange.maxID);
+        var id = this._getRandomInt(EmpireConfig.gameIdRange.minID, EmpireConfig.gameIdRange.maxID);
 
         var testGameID = this.RTDB.ref(`gameData/Empire/games/${id}/roles`);
         testGameID.transaction((currentData) => {
@@ -407,26 +408,27 @@ export class EmpireService implements OnDestroy {
     }
   }
 
-  getCodenameSubscriber: Subscription;
+  private __getCodenameSubscriber: Subscription;
   /**
    * returns the codenames that have joined
+   * @param id the gameid to examine
    */
   getCodename(id: number): Promise<any> {
     if (!id) {
       return Promise.reject("Null is not a valid id");
     } else {
       return new Promise((resFunc, rejFunc) => {
-        this.getCodenameSubscriber = this.AngularDB.object(`gameData/Empire/games/${id}/startRand`).snapshotChanges().subscribe(action => {
-          if (action.payload.val()==='finished'){
+        this.__getCodenameSubscriber = this.AngularDB.object(`gameData/Empire/games/${id}/startRand`).snapshotChanges().subscribe(action => {
+          if (action.payload.val() === 'finished') {
             var ref = this.RTDB.ref(`gameData/Empire/games/${id}/codenames`);
             ref.once('value')
-              .then(function (dataSnapshot) {
+              .then( (dataSnapshot) => {
                 // handle read data.
                 resFunc(dataSnapshot.val());
               }).catch((error) => {
                 rejFunc(error);
               });
-            this.getCodenameSubscriber.unsubscribe();
+            this.__getCodenameSubscriber.unsubscribe();
           }
         });
       })
@@ -434,10 +436,40 @@ export class EmpireService implements OnDestroy {
   }
 
   /**
+   * returns the complete list of users
+   * This has to be after the game has finished
+   * @param id the id to get
+   * @param asArray should the data be returned as an arrays
+   */
+  getAllUsers(id: number, asArray:boolean=true): Promise<any> {
+    if (!id) {
+      return Promise.reject("Null is not a valid id");
+    } else {
+      return new Promise(async (resFunc, rejFunc) => {
+       let dbList = `gameData/Empire/games/${id}/users`;
+          var ref = this.RTDB.ref(`gameData/Empire/games/${id}/users`);
+          ref.once('value')
+            .then( (dataSnapshot) => {
+            // handle read data.
+            if(asArray){
+              let data = dataSnapshot.val();
+              resFunc(Object.keys(data).map( key => data[key] ))
+            }else{
+              resFunc(dataSnapshot.val());
+            }
+          }).catch((error) => {
+            rejFunc(error);
+          });
+
+      });
+    }
+  }
+
+  /**
    * 
    */
   ngOnDestroy() {
-    this.gameStateListeners.killAll();
-    this.getCodenameSubscriber.unsubscribe();
+    this._gameStateListeners.killAll();
+    this.__getCodenameSubscriber.unsubscribe();
   }
 }
