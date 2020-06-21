@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import '@angular/material/prebuilt-themes/indigo-pink.css';
 import { authUIConfig } from '../auth-ui-config';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 
 const TAB_INDEX = {
@@ -16,12 +16,14 @@ const TAB_INDEX = {
 })
 export class LoginPageComponent implements OnInit {
   currTab: any;
+
   readonly authUIConfig = authUIConfig;
 
-  constructor(private route: ActivatedRoute) { }
+  constructor(private route: ActivatedRoute,
+    private router:Router) { }
 
   ngOnInit(): void {
-    this.setTab(this.route.snapshot.queryParamMap.get("tab"));
+    //this.setTab(this.route.snapshot.queryParamMap.get("tab"));
     this.route.queryParamMap.subscribe(queryParams  => {
       this.setTab(queryParams.get("tab")); 
    });
@@ -33,4 +35,10 @@ export class LoginPageComponent implements OnInit {
     else {this.currTab = TAB_INDEX["sign-in"]}
   }
 
+  loggedInCallback(event){
+    let  returnUrl = this.route.snapshot.queryParamMap.get("returnUrl");
+    if (returnUrl){
+      this.router.navigate([returnUrl],{replaceUrl:true});
+    }
+  }
 }

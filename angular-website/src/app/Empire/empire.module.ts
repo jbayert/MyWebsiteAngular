@@ -17,6 +17,7 @@ import { EmpireServiceModule } from './empire-service/empire-service.module';
 import { PlayerPageComponent } from '../empire/player-page/player-page.component';
 import { MonitorComponent } from './monitor/monitor.component';
 import { OwnerComponent } from './owner/owner.component';
+import { LoginGuard } from '../auth/login-guard/login.guard';
 
 @NgModule({
   declarations: [
@@ -37,7 +38,7 @@ import { OwnerComponent } from './owner/owner.component';
     MatRadioModule,
     MatProgressSpinnerModule
   ],
-  providers: [],
+  providers: [LoginGuard],
   bootstrap: [EmpireComponent],
   exports:[
   ],
