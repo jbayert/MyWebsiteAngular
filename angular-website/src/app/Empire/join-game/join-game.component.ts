@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { EmpireService } from '../empire-service/empire.service';
 import { UserProfile } from '../empire-service/empire-data.model';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-join-game',
@@ -16,7 +16,8 @@ export class JoinGameComponent implements OnInit {
   submitEnabled: boolean;
 
   constructor(private empireService: EmpireService,
-    private route: ActivatedRoute) {
+    private activatedRoute: ActivatedRoute,
+    private router: Router) {
     console.log(empireService);
     this.test = 5;
     this.submitEnabled = true;
@@ -36,7 +37,7 @@ export class JoinGameComponent implements OnInit {
     });
 
     this.guestID = false;
-    this.route.queryParamMap.subscribe(queryParams => {
+    this.activatedRoute.queryParamMap.subscribe(queryParams => {
       console.log("Query")
       console.log((!!queryParams.get("guestID")) && (queryParams.get("guestID") != "false"))
 
@@ -54,12 +55,16 @@ export class JoinGameComponent implements OnInit {
       gameToJoin.gameID);
     this.submitEnabled = false;
     this.empireService.joinGame(newUser, this.guestID).then((value) => {
-      console.log(value);
-      this.form.get('username').setValue('');
-      this.form.get('codename').setValue('');
-      this.form.get('username').markAsPristine();
-      this.form.get('codename').markAsPristine();
-      this.submitEnabled = true;
+      if(this.guestID){
+        console.log(value);
+        this.form.get('username').setValue('');
+        this.form.get('codename').setValue('');
+        this.form.get('username').markAsPristine();
+        this.form.get('codename').markAsPristine();
+        this.submitEnabled = true;
+      }else{
+        this.router.navigate(['../player'],{relativeTo: this.activatedRoute})
+      }
     }).catch((error) => {
       console.log(error);
       this.submitEnabled = true;

@@ -2,16 +2,21 @@
 </app-players-joined>
 <mat-spinner [hidden]="this.displayState !== 'loading'"></mat-spinner>
 
-<app-list-code-names [gameID]="this.gameID" *ngIf="this.displayState === this.stateOptions.playing" ></app-list-code-names>
+<div *ngIf="this.displayState === this.stateOptions.playing">
+    <app-list-code-names [gameID]="this.gameID"></app-list-code-names>
+</div>
+
 
 <div *ngIf="this.displayState === this.stateOptions.null">
     <h1>
         Game {{this.gameID}} is not valid!
     </h1>
 </div>
-<!--
+
 <div *ngIf="this.displayState === this.stateOptions.finished">
-    <app-list-results></app-list-results>
-    Finished
+    <h1>
+        game has finished
+    </h1> 
+    <app-result-list [gameID] = "this.gameID"></app-result-list>
+    
 </div>
--->
