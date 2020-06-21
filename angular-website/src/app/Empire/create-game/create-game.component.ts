@@ -11,21 +11,20 @@ export class CreateGameComponent implements OnInit {
 
   spinnerShown: boolean;
 
-  options:string[];
-
   constructor(private empireService: EmpireService,
     private router:Router) {
     this.spinnerShown = false;
    }
 
   ngOnInit(): void {
+    this.createGame();
   }
 
-  createGameCallback(): void{
+  createGame(): void{
     this.spinnerShown = true;
     this.empireService.createGame().then((id)=>{
       console.log(id);
-      this.router.navigate(['empire/owner'], { queryParams: {gameID: id }})
+      this.router.navigate(['empire/owner'], { queryParams: {gameID: id }, replaceUrl:true})
     }).catch((error)=>{
       console.log(error);
       this.spinnerShown = false;

@@ -1,1 +1,7 @@
-<ngx-auth-firebaseui appearance="fill" [guestEnabled] = "false" [providers] = authUIConfig.providers [tabIndex] = currTab ></ngx-auth-firebaseui>
+<ngx-auth-firebaseui 
+    appearance="fill" 
+    [guestEnabled] = "false" 
+    [providers] = authUIConfig.providers 
+    [tabIndex] = currTab 
+    (onSuccess) = "this.loggedInCallback($event)">
+</ngx-auth-firebaseui>
