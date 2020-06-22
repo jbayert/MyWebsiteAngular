@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree, Router, UrlSegment } from '@angular/router';
 import { Observable } from 'rxjs';
-import { AngularFireAuth } from '@angular/fire/auth';
 import { Route } from '@angular/compiler/src/core';
+import { EmpireService } from 'src/app/empire/empire-service/empire.service';
 
 @Injectable()
 export class LoginGuard implements CanActivate {
-  constructor(private auth: AngularFireAuth,
+  constructor(private empireService: EmpireService,
     private router: Router) {
 
   }
@@ -17,7 +17,7 @@ export class LoginGuard implements CanActivate {
     state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     return new Promise(async (resFunc, rejFunc) => {
       console.log("login Guard Called");
-      if (await this.auth.currentUser) {
+      if (await this.empireService.currentUser()) {
         // logged in so return true
         resFunc(true);
       } else {
@@ -31,12 +31,13 @@ export class LoginGuard implements CanActivate {
   canLoad(route: Route, segments: UrlSegment[]): Observable<boolean>|Promise<boolean>|boolean {
     return new Promise(async (resFunc, rejFunc) => {
       console.log("login Guard Called");
-      if (await this.auth.currentUser) {
+      if (await this.empireService.currentUser) {
         // logged in so return true
         resFunc(true);
       } else {
         resFunc(false);
       }
-    })  }
+    })  
+  }
 
 }

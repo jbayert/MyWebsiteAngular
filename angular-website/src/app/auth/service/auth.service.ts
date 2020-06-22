@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AngularFireAuth } from '@angular/fire/auth';
+import { EmpireService } from 'src/app/empire/empire-service/empire.service';
 
 @Injectable({
   providedIn: 'root'
@@ -8,5 +8,5 @@ export class AuthService {
 
   
 
-  constructor(public auth: AngularFireAuth) { }
+  constructor(public empireService: EmpireService) { }
 }

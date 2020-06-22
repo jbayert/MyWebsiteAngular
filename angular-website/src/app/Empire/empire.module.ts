@@ -12,21 +12,15 @@ import { environment } from 'src/environments/environment';
 
 
 import { JoinGameComponent } from './join-game/join-game.component';
-import { CreateGameComponent } from './create-game/create-game.component';
 import { EmpireServiceModule } from './empire-service/empire-service.module';
 import { PlayerPageComponent } from '../empire/player-page/player-page.component';
-import { MonitorComponent } from './monitor/monitor.component';
-import { OwnerComponent } from './owner/owner.component';
 import { LoginGuard } from '../auth/login-guard/login.guard';
 
 @NgModule({
   declarations: [
     EmpireComponent,
     JoinGameComponent,
-    CreateGameComponent,
     PlayerPageComponent,
-    MonitorComponent,
-    OwnerComponent,
   ],
   imports: [
     EmpireServiceModule,
@@ -38,9 +32,7 @@ import { LoginGuard } from '../auth/login-guard/login.guard';
     MatRadioModule,
     MatProgressSpinnerModule
   ],
-  providers: [LoginGuard],
-  bootstrap: [EmpireComponent],
-  exports:[
-  ],
+  providers: [LoginGuard,],
+  bootstrap: [EmpireComponent,],
 })
 export class EmpireModule { }

@@ -18,14 +18,12 @@ import { GameState, GameStateOption, UserProfile } from './empire-data.model';
 import { FormControl, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { GameStateListeners } from './empire-game-listener.model';
-import { async } from '@angular/core/testing';
 
 @Injectable({
   providedIn: EmpireServiceModule
 })
 export class EmpireService implements OnDestroy {
   private RTDB: firebase.database.Database;
-  private firebaseAuth: firebase.auth.Auth;
   private _gameStateListeners: GameStateListeners;
 
   /**
@@ -33,10 +31,23 @@ export class EmpireService implements OnDestroy {
    * @param auth the auth service
    * @param AngularDB the angular fire database that is sometimes used
    */
-  constructor(private auth: AngularFireAuth, private AngularDB: AngularFireDatabase) {
+  constructor(
+    private auth: AngularFireAuth, 
+    private AngularDB: AngularFireDatabase) {
+
     this.RTDB = firebase.database();
-    this.firebaseAuth = firebase.auth();
     this._gameStateListeners = new GameStateListeners(this.RTDB);
+  }
+
+  currentUser():Promise<firebase.User>{
+    return new Promise<firebase.User>((resFunc,rejFunc)=>{
+      this.auth.user
+        .pipe(first()).subscribe(
+          (user)=>{
+            resFunc(user);
+          }
+        )
+    })
   }
 
   /**
@@ -183,9 +194,9 @@ export class EmpireService implements OnDestroy {
    * @param guestID 
    */
   joinGame(newUser: UserProfile, guestID: boolean): Promise<any> {
-    return new Promise((resFunc, rejFunc) => {
+    return new Promise(async (resFunc, rejFunc) => {
       if (!guestID) {
-        var user = this.firebaseAuth.currentUser;
+        var user = await this.currentUser();
         if (user) {
           //there is a user logged in
           var toAddRef = this.RTDB.ref(`gameData/Empire/games/${newUser.gameID}/users/${user.uid}`);
@@ -233,7 +244,7 @@ export class EmpireService implements OnDestroy {
    * @returns returns a promise of the game id 
    */
   createGame(timeoutMS: number = 10000, timeoutNum: number = 10): Promise<number | null> {
-    return new Promise((resFunc, rejFunction) => {
+    return new Promise(async (resFunc, rejFunction) => {
       if (timeoutNum < 0) {
         rejFunction({ reason: "Recursion Timeout." });
       }
@@ -244,7 +255,7 @@ export class EmpireService implements OnDestroy {
       }, timeoutMS)
 
 
-      var user = this.firebaseAuth.currentUser;
+      var user = await this.currentUser();
       if (user) {
         var id = this._getRandomInt(EmpireConfig.gameIdRange.minID, EmpireConfig.gameIdRange.maxID);
 

@@ -1,15 +1,15 @@
-//TODO: remove the router
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { OwnerModuleComponent } from './owner-module.component';
-import { CreateGameComponent } from '../create-game/create-game.component';
-import { PlayersJoinedComponent } from '../players-joined/players-joined.component'
+import { GameComponent } from './game/game.component';
+import { CreateGameComponent } from './create-game/create-game.component';
+import { OwnerComponent } from './owner/owner.component';
 
 const routes: Routes = [
   { path: 'createGame', component: CreateGameComponent},
-  { path: 'players-joined', component: PlayersJoinedComponent},
-  { path: '', component: OwnerModuleComponent }
+  { path: 'game', component: GameComponent},
+  //TODO: screen
+  { path: '', component: OwnerComponent },
 ];
 
 @NgModule({

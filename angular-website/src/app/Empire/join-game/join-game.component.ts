@@ -11,16 +11,14 @@ import { ActivatedRoute, Router } from '@angular/router';
 })
 export class JoinGameComponent implements OnInit {
   form: FormGroup;
-  test: any;
   guestID: boolean;
   submitEnabled: boolean;
 
   constructor(private empireService: EmpireService,
     private activatedRoute: ActivatedRoute,
     private router: Router) {
-    console.log(empireService);
-    this.test = 5;
     this.submitEnabled = true;
+    this.guestID = false;
   };
 
   ngOnInit() {
@@ -39,13 +37,13 @@ export class JoinGameComponent implements OnInit {
     this.guestID = false;
     this.activatedRoute.queryParamMap.subscribe(queryParams => {
       console.log("Query")
-      console.log((!!queryParams.get("guestID")) && (queryParams.get("guestID") != "false"))
-
-      this.guestID = (!!queryParams.get("guestID")) && (queryParams.get("guestID") != "false");
       if (queryParams.get("gameID")) {
         this.form.get("gameID").setValue(+queryParams.get("gameID"));
       }
-    });
+    }); 
+    this.activatedRoute.data.subscribe((data)=>{
+      this.guestID = data.guestID;
+    })
   }
 
   onSubmit(gameToJoin) {

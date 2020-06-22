@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, ChangeDetectorRef } from '@angular/core';
-import { EmpireService } from '../empire-service/empire.service';
+import { EmpireService } from '../../empire-service/empire.service';
 import { async } from '@angular/core/testing';
 
 @Component({

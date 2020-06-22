@@ -19,7 +19,9 @@ export class PlayerPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.gameStatusSub.unsubscribe();
+    if (this.gameStatusSub){
+      this.gameStatusSub.unsubscribe();
+    }
   }
 
 }

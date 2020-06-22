@@ -8,8 +8,8 @@ const routes: Routes =[
   { path: 'user', component: LoginPageComponent },
   { path: 'login', redirectTo: '/user?tab=sign-in'},
   { path: 'register', redirectTo: '/user?tab=register'},
+  { path: 'empire', loadChildren: () => import('./empire/empire.module').then(m => m.EmpireModule) },
   { path: '', component: HomeComponent },
-  { path: 'empire', loadChildren: () => import('./empire/empire.module').then(m => m.EmpireModule) }
 ];
 
 

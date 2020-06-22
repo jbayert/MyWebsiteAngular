@@ -1,16 +1,16 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
-import { EmpireService } from '../empire-service/empire.service';
+import { EmpireService } from '../../empire-service/empire.service';
 import { ActivatedRoute } from '@angular/router';
-import { GameStateOption, GameState } from '../empire-service/empire-data.model';
-import { Observable, Subscription } from 'rxjs';
+import { GameStateOption, GameState } from '../../empire-service/empire-data.model';
+import { Subscription } from 'rxjs';
 
 
 @Component({
-  selector: 'app-owner',
-  templateUrl: './owner-module.component.html',
-  styleUrls: ['./owner-module.component.scss']
+  selector: 'app-game',
+  templateUrl: './game.component.html',
+  styleUrls: ['./game.component.scss']
 })
-export class OwnerModuleComponent implements OnInit, OnDestroy {
+export class GameComponent implements OnInit, OnDestroy {
   displayState: any;
   gameState:GameState;
 
