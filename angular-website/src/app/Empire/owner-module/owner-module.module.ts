@@ -1,23 +1,33 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { OwnerModuleComponent } from './owner-module.component';
-import { PlayersJoinedComponent } from '../players-joined/players-joined.component';
+import { GameComponent } from './game/game.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { ListCodeNamesComponent } from '../list-code-names/list-code-names.component';
-import { ResultListComponent } from '../result-list/result-list.component';
+import { OwnerModuleRoutingModule } from './owner-module-routing.module';
+import { ResultListModule } from '../result-list/result-list.module';
+import { CreateGameComponent } from './create-game/create-game.component';
+import { ListCodeNamesComponent } from './list-code-names/list-code-names.component';
+import { PlayersJoinedComponent } from './players-joined/players-joined.component';
+import { OwnerGuard } from './owner-guard/owner.guard';
+import { OwnerComponent } from './owner/owner.component';
 
 @NgModule({
   declarations: [
-    OwnerModuleComponent,
-    PlayersJoinedComponent,
+    GameComponent,
+    CreateGameComponent,
     ListCodeNamesComponent,
-    ResultListComponent
+    PlayersJoinedComponent,
+    OwnerComponent,
   ],
   imports: [
     CommonModule,
-    MatProgressSpinnerModule
-  ]
+    MatProgressSpinnerModule,
+    OwnerModuleRoutingModule,
+    ResultListModule,
+  ],
+  providers:[
+    OwnerGuard,
+  ],
 })
 export class OwnerModuleModule { 
   

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { EmpireService } from '../empire-service/empire.service';
 import { Router, ActivatedRoute } from '@angular/router';
+import { EmpireService } from '../../empire-service/empire.service';
 
 @Component({
   selector: 'app-create-game',
@@ -24,7 +24,7 @@ export class CreateGameComponent implements OnInit {
     this.spinnerShown = true;
     this.empireService.createGame().then((id)=>{
       console.log(id);
-      this.router.navigate(['empire/owner'], { queryParams: {gameID: id }, replaceUrl:true})
+      this.router.navigate(['empire/owner/game'], { queryParams: {gameID: id }, replaceUrl:true})
     }).catch((error)=>{
       console.log(error);
       this.spinnerShown = false;
