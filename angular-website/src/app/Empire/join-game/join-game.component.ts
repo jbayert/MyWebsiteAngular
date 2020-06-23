@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { FormGroup, FormControl, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { EmpireService } from '../empire-service/empire.service';
 import { UserProfile } from '../empire-service/empire-data.model';
 import { ActivatedRoute, Router } from '@angular/router';
+import { GetDomainService } from 'src/app/get-domain-service/get-domain.service';
 
 @Component({
   selector: 'app-join-game',
@@ -33,7 +34,7 @@ export class JoinGameComponent implements OnInit {
         asyncValidators: this.empireService.gameIdValidator
       })
     });
-
+    
     this.guestID = false;
     this.activatedRoute.queryParamMap.subscribe(queryParams => {
       console.log("Query")

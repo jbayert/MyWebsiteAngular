@@ -30,9 +30,11 @@ import { LoginGuard } from '../auth/login-guard/login.guard';
     FormsModule,
     AngularFireModule.initializeApp(environment.firebaseConfig),
     MatRadioModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
   ],
-  providers: [LoginGuard,],
+  providers: [
+    LoginGuard
+  ],
   bootstrap: [EmpireComponent,],
 })
 export class EmpireModule { }
