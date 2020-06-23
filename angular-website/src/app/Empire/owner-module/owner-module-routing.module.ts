@@ -4,12 +4,14 @@ import { Routes, RouterModule } from '@angular/router';
 import { GameComponent } from './game/game.component';
 import { CreateGameComponent } from './create-game/create-game.component';
 import { OwnerComponent } from './owner/owner.component';
+import { MonitorComponent } from './monitor/monitor.component';
 
 const routes: Routes = [
-  { path: 'createGame', component: CreateGameComponent},
-  { path: 'game', component: GameComponent},
+  { path: 'createGame', component: CreateGameComponent },
+  { path: 'game', component: GameComponent },
+  { path: 'present', component: MonitorComponent },
   //TODO: screen
-  { path: '', component: OwnerComponent },
+  { path: '', component: OwnerComponent, },
 ];
 
 @NgModule({

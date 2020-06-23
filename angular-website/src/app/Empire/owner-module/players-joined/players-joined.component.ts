@@ -1,9 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { AngularFireDatabase, AngularFireList } from '@angular/fire/database';
 import { Observable } from 'rxjs';
 import {EmpireService } from '../../empire-service/empire.service';
-import { GameState, GameStateOption } from '../../empire-service/empire-data.model';
 
 @Component({
   selector: 'app-players-joined',
