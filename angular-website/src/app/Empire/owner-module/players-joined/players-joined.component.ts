@@ -1,7 +1,10 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import {EmpireService } from '../../empire-service/empire.service';
+import { GetDomainService } from 'src/app/get-domain-service/get-domain.service';
+import { DOCUMENT } from '@angular/common';
+
 
 @Component({
   selector: 'app-players-joined',
@@ -10,7 +13,8 @@ import {EmpireService } from '../../empire-service/empire.service';
 })
 export class PlayersJoinedComponent implements OnInit {
   curGameID:number;
-  
+  urlToJoin:string;
+
   @Input()
   set gameID(gameID: number){
     this.curGameID =  gameID;
@@ -19,14 +23,17 @@ export class PlayersJoinedComponent implements OnInit {
   items: Observable<any[]>;
 
   constructor(
-    private route: ActivatedRoute,
-    private empireService: EmpireService
+    private empireService: EmpireService,
+    private getDomainService: GetDomainService,
+    @Inject(DOCUMENT) private document: Document,
   ) {
     this.curGameID = null;
   }
 
   ngOnInit(): void {
-
+    this.urlToJoin = this.getDomainService.getHostname();
+    console.log(this.urlToJoin)
+    console.log(this.document)
   }
 
   startGame(){

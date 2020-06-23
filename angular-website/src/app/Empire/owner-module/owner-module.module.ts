@@ -9,6 +9,7 @@ import { CreateGameComponent } from './create-game/create-game.component';
 import { ListCodeNamesComponent } from './list-code-names/list-code-names.component';
 import { PlayersJoinedComponent } from './players-joined/players-joined.component';
 import { OwnerComponent } from './owner/owner.component';
+import { GetDomainModule } from 'src/app/get-domain-service/get-domain.module';
 
 @NgModule({
   declarations: [
@@ -23,6 +24,7 @@ import { OwnerComponent } from './owner/owner.component';
     MatProgressSpinnerModule,
     OwnerModuleRoutingModule,
     ResultListModule,
+    GetDomainModule,
   ],
 })
 export class OwnerModuleModule { 

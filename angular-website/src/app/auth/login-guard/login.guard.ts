@@ -14,13 +14,11 @@ export class LoginGuard implements CanActivate {
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     return new Promise(async (resFunc, rejFunc) => {
-      console.log("login Guard Called");
-      console.log(next.data)
+
       if (await this.empireService.currentUser()) {
         // logged in so return true
         resFunc(true);
       } else {
-        console.log(next.data.redirectTo)
         if (next.data.redirectTo){
           this.router.navigate([next.data.redirectTo], );
         }else{
@@ -34,14 +32,11 @@ export class LoginGuard implements CanActivate {
 
   canLoad(route: Route, segments: UrlSegment[]): Observable<boolean>|Promise<boolean>|boolean {
     return new Promise(async (resFunc, rejFunc) => {
-      console.log("login Guard Called");
-      console.log(route);
-      console.log(segments);
+
       if (await this.empireService.currentUser) {
         // logged in so return true
         resFunc(true);
       } else {
-        this.router.navigate(['user'], { queryParams: {tab:"register", returnUrl: "test" } });
         resFunc(false);
       }
     })  
