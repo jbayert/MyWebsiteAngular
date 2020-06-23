@@ -10,7 +10,12 @@ const routes: Routes = [
   {
     path: 'join',
     component: JoinGameComponent,
-    data: {guestID:false},
+    data: {
+      guestID:false,
+      //TODO: make relative
+      redirectTo:'empire/join-as-guest',
+    },
+    canActivate:[LoginGuard],
   },
   {
     path: 'join-as-guest',
@@ -21,6 +26,8 @@ const routes: Routes = [
   {
     path: 'owner',
     loadChildren: () => import('./owner-module/owner-module.module').then(m => m.OwnerModuleModule),
+    canLoad:[LoginGuard],
+    canActivate:[LoginGuard],
   },
   { path: '', component: EmpireComponent },
 ];

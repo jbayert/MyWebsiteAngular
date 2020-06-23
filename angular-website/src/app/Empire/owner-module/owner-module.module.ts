@@ -8,7 +8,6 @@ import { ResultListModule } from '../result-list/result-list.module';
 import { CreateGameComponent } from './create-game/create-game.component';
 import { ListCodeNamesComponent } from './list-code-names/list-code-names.component';
 import { PlayersJoinedComponent } from './players-joined/players-joined.component';
-import { OwnerGuard } from './owner-guard/owner.guard';
 import { OwnerComponent } from './owner/owner.component';
 
 @NgModule({
@@ -24,9 +23,6 @@ import { OwnerComponent } from './owner/owner.component';
     MatProgressSpinnerModule,
     OwnerModuleRoutingModule,
     ResultListModule,
-  ],
-  providers:[
-    OwnerGuard,
   ],
 })
 export class OwnerModuleModule { 
