@@ -1,4 +1,5 @@
-<h1>Join the game at {{this.urlToJoin}}</h1><!--TODO: add URL -->
+<h1>Join the game at {{this.joinUrl}}</h1>
+<qrcode [qrdata]="this.joinUrlwithID" [width]="256" [errorCorrectionLevel]="'M'"></qrcode>
 <h2>Enter game code {{this.curGameID}}</h2>
 
 

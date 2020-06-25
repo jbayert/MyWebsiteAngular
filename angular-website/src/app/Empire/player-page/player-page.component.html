@@ -1,2 +1,32 @@
-<p>Thanks for joining</p>
-<p>Waiting for the game to start...</p>
+<div *ngIf="this.displayState === this.stateOptions.acceptingUsers">
+    <h1>
+        Waiting for the game to start. 
+    </h1>
+    <h1>
+        Don't tell anyone your Code Name.
+    </h1>
+    <button (click) = "addGuest()">Add another player</button>
+</div>
+
+<div *ngIf="this.displayState === this.stateOptions.playing">
+    <h1>
+        The game is currently playing. 
+    </h1>
+    <h1>
+        Don't forget any names.
+    </h1>
+</div>
+
+<div *ngIf="this.displayState === this.stateOptions.null">
+    <h1>
+        Game {{this.gameID}} is not valid!
+    </h1>
+</div>
+
+<div *ngIf="this.displayState === this.stateOptions.finished">
+    <h1>
+        game has finished
+    </h1> 
+    <app-result-list [gameID] = "this.gameID"></app-result-list>
+    
+</div>

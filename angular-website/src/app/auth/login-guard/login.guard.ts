@@ -14,13 +14,14 @@ export class LoginGuard implements CanActivate {
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     return new Promise(async (resFunc, rejFunc) => {
-
+      console.log(next);
+      console.log(state);
       if (await this.empireService.currentUser()) {
         // logged in so return true
         resFunc(true);
       } else {
         if (next.data.redirectTo){
-          this.router.navigate([next.data.redirectTo], );
+          this.router.navigate([next.data.redirectTo], { queryParams: next.queryParams });
         }else{
           // not logged in so redirect to login page with the return url and return false
           this.router.navigate(['user'], { queryParams: {tab:"register", returnUrl: state.url } });

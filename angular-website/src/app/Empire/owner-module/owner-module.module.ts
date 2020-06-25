@@ -10,6 +10,7 @@ import { ListCodeNamesComponent } from './list-code-names/list-code-names.compon
 import { PlayersJoinedComponent } from './players-joined/players-joined.component';
 import { OwnerComponent } from './owner/owner.component';
 import { GetDomainModule } from 'src/app/get-domain-service/get-domain.module';
+import { QRCodeModule } from 'angularx-qrcode';
 
 @NgModule({
   declarations: [
@@ -25,6 +26,7 @@ import { GetDomainModule } from 'src/app/get-domain-service/get-domain.module';
     OwnerModuleRoutingModule,
     ResultListModule,
     GetDomainModule,
+    QRCodeModule,
   ],
 })
 export class OwnerModuleModule { 

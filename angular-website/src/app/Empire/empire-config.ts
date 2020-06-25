@@ -3,5 +3,5 @@ export const EmpireConfig = {
         minID: 100,//inclusive
         maxID: 99999
     },
-    joinRoute:"/join",
+    joinUrl:"http://localhost:4200/empire/join",
 }

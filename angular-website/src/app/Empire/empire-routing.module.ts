@@ -12,7 +12,7 @@ const routes: Routes = [
     component: JoinGameComponent,
     data: {
       guestID:false,
-      //TODO: make relative
+      //TODO: make relative add relative to canActivate
       redirectTo:'empire/join-as-guest',
     },
     canActivate:[LoginGuard],
