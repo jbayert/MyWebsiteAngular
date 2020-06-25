@@ -33,7 +33,7 @@ export class GameComponent implements OnInit, OnDestroy {
 
   constructor(private empireService: EmpireService,
     private changeDetector: ChangeDetectorRef,
-    private route: ActivatedRoute) {
+    private route: ActivatedRoute,) {
     this.displayState = 'loading';
   }
 

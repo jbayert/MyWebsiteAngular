@@ -1,4 +1,7 @@
 <button [hidden] = "!startButtonShown" (click)=startBtn()>Start Listing codename</button>
-<mat-spinner [hidden] = "!spinnerShown" ></mat-spinner>
+<div *ngIf = "spinnerShown" >
+    <h1>Shuffling Names...</h1>
+    <mat-spinner></mat-spinner>
+</div>
 <h1>{{nameShown}}</h1>
 <button (click)=finishGameBtn()>Finish Game</button>

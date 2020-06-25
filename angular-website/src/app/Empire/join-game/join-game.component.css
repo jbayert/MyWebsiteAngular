@@ -8,7 +8,7 @@
     color: #d93a3e;
   }
 
-  button[type=submit] {
+  button {
     background-color: #45bf94;
     border: 0;
     padding: 10px;
@@ -17,7 +17,7 @@
     color: #ffffff;
     cursor: pointer;
   }
-  button[type=submit]:disabled {
+  button:disabled {
     background-color: #333;
     color: #666;
     cursor: default;

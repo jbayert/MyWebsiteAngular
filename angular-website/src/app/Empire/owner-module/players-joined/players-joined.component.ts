@@ -1,9 +1,8 @@
 import { Component, OnInit, Input, Inject } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import {EmpireService } from '../../empire-service/empire.service';
 import { GetDomainService } from 'src/app/get-domain-service/get-domain.service';
-import { DOCUMENT } from '@angular/common';
+import { EmpireConfig } from '../../empire-config';
 
 
 @Component({
@@ -13,7 +12,8 @@ import { DOCUMENT } from '@angular/common';
 })
 export class PlayersJoinedComponent implements OnInit {
   curGameID:number;
-  urlToJoin:string;
+  joinUrl:string;
+  joinUrlwithID:string;
 
   @Input()
   set gameID(gameID: number){
@@ -24,16 +24,13 @@ export class PlayersJoinedComponent implements OnInit {
 
   constructor(
     private empireService: EmpireService,
-    private getDomainService: GetDomainService,
-    @Inject(DOCUMENT) private document: Document,
   ) {
     this.curGameID = null;
   }
 
   ngOnInit(): void {
-    this.urlToJoin = this.getDomainService.getHostname();
-    console.log(this.urlToJoin)
-    console.log(this.document)
+    this.joinUrl = EmpireConfig.joinUrl;
+    this.joinUrlwithID = EmpireConfig.joinUrl + `?gameID=${this.curGameID}`
   }
 
   startGame(){

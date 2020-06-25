@@ -14,6 +14,7 @@ export class JoinGameComponent implements OnInit {
   form: FormGroup;
   guestID: boolean;
   submitEnabled: boolean;
+  gameIDfromQuery:number;
 
   constructor(private empireService: EmpireService,
     private activatedRoute: ActivatedRoute,
@@ -24,8 +25,10 @@ export class JoinGameComponent implements OnInit {
 
   ngOnInit() {
     this.form = new FormGroup({
-      username: new FormControl('', Validators.required),
-      codename: new FormControl('', Validators.required),
+      username: new FormControl('', {validators: Validators.required, 
+        updateOn:'change'}),
+      codename: new FormControl('', {validators: Validators.required, 
+        updateOn:'change'}),
       gameID: new FormControl('', {
         validators: Validators.compose([
           Validators.required,
@@ -62,12 +65,21 @@ export class JoinGameComponent implements OnInit {
         this.form.get('codename').markAsPristine();
         this.submitEnabled = true;
       }else{
-        this.router.navigate(['../player'],{relativeTo: this.activatedRoute})
+        this.switchToPlayerTab();
+        //this.router.navigate(['../player'],{relativeTo: this.activatedRoute,queryParams:{gameID:gameToJoin.gameID }})
       }
     }).catch((error) => {
       console.log(error);
       this.submitEnabled = true;
     });
+  }
+
+  switchToPlayerTab(){
+    if (!this.form.get('gameID').errors){
+      let gameID = this.form.get('gameID').value
+      this.router.navigate(['../player'],{relativeTo: this.activatedRoute,queryParams:{gameID: gameID }})
+
+    }
   }
 
   get submitBtnText(): string {

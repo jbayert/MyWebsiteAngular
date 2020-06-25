@@ -1,6 +1,5 @@
 import { Component, OnInit, Input, ChangeDetectorRef } from '@angular/core';
 import { EmpireService } from '../../empire-service/empire.service';
-import { async } from '@angular/core/testing';
 
 @Component({
   selector: 'app-list-code-names',
@@ -50,11 +49,11 @@ export class ListCodeNamesComponent implements OnInit {
         this.nameShown = this.codeNames[key];
         this.changeDetector.detectChanges();
         await this.sleeper(this.delayLength);
-        //console.log(ms);
       }
       this.nameShown = "";
       this.changeDetector.detectChanges();
-      resFunc("Names Finished")
+      this.startButtonShown = true;
+      resFunc("Names Finished");
     })
   }
 
