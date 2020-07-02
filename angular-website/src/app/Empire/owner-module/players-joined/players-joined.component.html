@@ -3,7 +3,7 @@
 <h2>Enter game code {{this.curGameID}}</h2>
 
 
-<button (click) = startGame()>Start the Game</button>
+<button [hidden]="this.isMonitor" (click) = startGame()>Start the Game</button>
 
 <h2>Players that have Joined</h2>
 

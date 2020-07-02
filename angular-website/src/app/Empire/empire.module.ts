@@ -16,6 +16,7 @@ import { EmpireServiceModule } from './empire-service/empire-service.module';
 import { PlayerPageComponent } from '../empire/player-page/player-page.component';
 import { LoginGuard } from '../auth/login-guard/login.guard';
 import { ResultListModule } from './result-list/result-list.module';
+import { ExtrasModule } from '../extras/extras.module';
 
 @NgModule({
   declarations: [
@@ -33,6 +34,7 @@ import { ResultListModule } from './result-list/result-list.module';
     MatRadioModule,
     MatProgressSpinnerModule,
     ResultListModule,
+    ExtrasModule,
   ],
   providers: [
     LoginGuard

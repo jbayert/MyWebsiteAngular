@@ -4,6 +4,7 @@ import { EmpireService } from '../empire-service/empire.service';
 import { UserProfile } from '../empire-service/empire-data.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GetDomainService } from 'src/app/get-domain-service/get-domain.service';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-join-game',
@@ -15,6 +16,9 @@ export class JoinGameComponent implements OnInit {
   guestID: boolean;
   submitEnabled: boolean;
   gameIDfromQuery:number;
+
+  snackbarText:string = "Hello";
+  showSnackbarSubject:Subject<boolean> = new Subject<boolean>();
 
   constructor(private empireService: EmpireService,
     private activatedRoute: ActivatedRoute,
@@ -59,11 +63,16 @@ export class JoinGameComponent implements OnInit {
     this.empireService.joinGame(newUser, this.guestID).then((value) => {
       if(this.guestID){
         console.log(value);
+        let name = this.form.get('username').value;
         this.form.get('username').setValue('');
         this.form.get('codename').setValue('');
         this.form.get('username').markAsPristine();
         this.form.get('codename').markAsPristine();
         this.submitEnabled = true;
+
+        //snackbar
+        this.snackbarText = `${name} was added.`
+        this.showSnackbarSubject.next(true);
       }else{
         this.switchToPlayerTab();
         //this.router.navigate(['../player'],{relativeTo: this.activatedRoute,queryParams:{gameID:gameToJoin.gameID }})

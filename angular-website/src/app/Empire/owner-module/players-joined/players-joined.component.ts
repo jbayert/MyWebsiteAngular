@@ -16,6 +16,9 @@ export class PlayersJoinedComponent implements OnInit {
   joinUrlwithID:string;
 
   @Input()
+  isMonitor:boolean = false;
+
+  @Input()
   set gameID(gameID: number){
     this.curGameID =  gameID;
     this.items = this.empireService.getPlayersJoined(this.curGameID);

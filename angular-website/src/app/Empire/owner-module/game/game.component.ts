@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ApplicationRef, NgZone } from '@angular/core';
 import { EmpireService } from '../../empire-service/empire.service';
 import { ActivatedRoute } from '@angular/router';
 import { GameStateOption, GameState } from '../../empire-service/empire-data.model';
@@ -17,6 +17,8 @@ export class GameComponent implements OnInit, OnDestroy {
   stateSubscription: Subscription;
   stateOptions = GameStateOption;
 
+  isMonitor:boolean=false;
+
   private _gameID: number;
   get gameID(): number {
     return this._gameID;
@@ -32,8 +34,9 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   constructor(private empireService: EmpireService,
-    private changeDetector: ChangeDetectorRef,
-    private route: ActivatedRoute,) {
+    private route: ActivatedRoute,
+    private applicationRef:ApplicationRef,
+    private zone:NgZone) {
     this.displayState = 'loading';
   }
 
@@ -43,6 +46,12 @@ export class GameComponent implements OnInit, OnDestroy {
         this.gameID = +queryParams.get("gameID");
       }
     });
+    if (this.route.snapshot.data.isMonitor) {
+      this.isMonitor = this.route.snapshot.data.isMonitor;
+      this.empireService.getPresentGame()
+        .then((id)=>{this.gameID = id})
+        .catch((error)=>{console.log(error)})
+    }
   }
 
 
@@ -55,16 +64,15 @@ export class GameComponent implements OnInit, OnDestroy {
       if (this._gameID >0){
         let listener = await this.empireService.listenGameState(this._gameID);
         this.stateSubscription = listener.subscribe((gameState:GameState) => {
-          if (!!gameState) {
-            this.displayState = gameState.state;
-            this.gameState = gameState;
-          } else {
-  
-          }
-          this.changeDetector.detectChanges();
+          this.zone.run(()=>{
+
+            if (!!gameState) {
+              this.displayState = gameState.state;
+              this.gameState = gameState;
+            } 
+            this.applicationRef.tick();
+          })
         })
-      }else{
-        this.changeDetector.detectChanges();
       }
     }catch(error){
       console.log(error);

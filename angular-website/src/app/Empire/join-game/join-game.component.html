@@ -58,3 +58,6 @@
 <button [disabled]="this.form.get('gameID').errors" (click)="this.switchToPlayerTab()">
   Continue Without Joining
 </button>
+
+
+<app-snackbar [text] = "snackbarText" [showEvent] = "this.showSnackbarSubject.asObservable()"></app-snackbar>

@@ -32,18 +32,18 @@ export class EmpireService implements OnDestroy {
    * @param AngularDB the angular fire database that is sometimes used
    */
   constructor(
-    private auth: AngularFireAuth, 
+    private auth: AngularFireAuth,
     private AngularDB: AngularFireDatabase) {
 
     this.RTDB = firebase.database();
     this._gameStateListeners = new GameStateListeners(this.RTDB);
   }
 
-  currentUser():Promise<firebase.User>{
-    return new Promise<firebase.User>((resFunc,rejFunc)=>{
+  currentUser(): Promise<firebase.User> {
+    return new Promise<firebase.User>((resFunc, rejFunc) => {
       this.auth.user
         .pipe(first()).subscribe(
-          (user)=>{
+          (user) => {
             resFunc(user);
           }
         )
@@ -93,6 +93,18 @@ export class EmpireService implements OnDestroy {
         }
       })
     }
+
+  }
+
+  getNextGame(id: number): Promise<number> {
+    return new Promise<number>((resFunc, rejFunc) => {
+      this.RTDB.ref(`gameData/Empire/games/${id}/next_game`).once('value')
+        .then((dataSnapshot) => {
+          resFunc(dataSnapshot.val())
+        }).catch((error) => {
+          rejFunc(error);
+        });
+    })
 
   }
 
@@ -217,7 +229,6 @@ export class EmpireService implements OnDestroy {
         }
       } else {
         var id = this.__makeGuestId(8);
-        console.log(id);
         //there is a user logged in
         var toAddRed = this.RTDB.ref(`gameData/Empire/games/${newUser.gameID}/guests/${id}`);
         toAddRed.update({
@@ -268,7 +279,7 @@ export class EmpireService implements OnDestroy {
           } else {
             return;
           }
-        }, (error, committed, snapshot) => {
+        }, async (error, committed, snapshot) => {
           if (error) {
             //raise an error
             rejFunction(error);
@@ -281,9 +292,13 @@ export class EmpireService implements OnDestroy {
               testGameID.set(new Date().getTime()).then((value) => {
                 //add state listener
                 this.listenGameState(id);
-                resFunc(id);
-              }).catch((state_error) => {
-                rejFunction({ reason: "Error Updating State", error: state_error })
+                this.addPresentGame(id).then(() => {
+                  resFunc(id);
+                }).catch((error) => {
+                  rejFunction(error);
+                })
+              }).catch((error) => {
+                rejFunction({ reason: "Error Updating TimeStamp", error: error })
               });
             }).catch((state_error) => {
               rejFunction({ reason: "Error Updating State", error: state_error })
@@ -331,7 +346,7 @@ export class EmpireService implements OnDestroy {
    * sets the state of a game
    * @param id the gameID to set the state
    * @param state the state to set
-   * @returns
+   * @returns returns the newState and a message
    */
   private setState(id: number, state: GameState): Promise<any> {
     if (!id) {
@@ -348,15 +363,16 @@ export class EmpireService implements OnDestroy {
                 this.shuffleUsernames(id).then(() => {
                   resFunc({
                     newState: state,
-                    message: `State Updated to ${state}`
+                    message: `State Updated to ${state.state}`
                   });
                 }).catch((error) => {
                   rejFunc(error);
                 })
               } else {
+
                 resFunc({
                   newState: state,
-                  message: `State Updated to ${state}`
+                  message: `State Updated to ${state.state}`
                 });
               }
             }
@@ -399,9 +415,33 @@ export class EmpireService implements OnDestroy {
             }
           }
         }).catch((error) => {
-          console.log(error);
+          rejFunc(error);
         })
       })
+    }
+  }
+
+  restartGame(id: number): Promise<number> {
+    if (!id) {
+      return Promise.reject("Null is not a valid id");
+    } else {
+      return new Promise(async (resFunc, rejFunc) => {
+        try {
+          let newGameId = await this.createGame();
+          let state = await this.setState(id, new GameState(GameStateOption.restarted));
+          var toAddRef = this.RTDB.ref(`gameData/Empire/games/${id}/next_game`);
+          toAddRef.set(newGameId, (error) => {
+            if (error) {
+              rejFunc(error);
+            } else {
+              resFunc(newGameId);
+            }
+          })
+        } catch (error) {
+          rejFunc(error)
+        }
+
+      });
     }
   }
 
@@ -433,7 +473,7 @@ export class EmpireService implements OnDestroy {
           if (action.payload.val() === 'finished') {
             var ref = this.RTDB.ref(`gameData/Empire/games/${id}/codenames`);
             ref.once('value')
-              .then( (dataSnapshot) => {
+              .then((dataSnapshot) => {
                 // handle read data.
                 resFunc(dataSnapshot.val());
               }).catch((error) => {
@@ -452,20 +492,20 @@ export class EmpireService implements OnDestroy {
    * @param id the id to get
    * @param asArray should the data be returned as an arrays
    */
-  getAllUsers(id: number, asArray:boolean=true): Promise<any> {
+  getAllUsers(id: number, asArray: boolean = true): Promise<any> {
     if (!id) {
       return Promise.reject("Null is not a valid id");
     } else {
       return new Promise(async (resFunc, rejFunc) => {
-       let dbList = `gameData/Empire/games/${id}/users`;
-          var ref = this.RTDB.ref(`gameData/Empire/games/${id}/users`);
-          ref.once('value')
-            .then( (dataSnapshot) => {
+        let dbList = `gameData/Empire/games/${id}/users`;
+        var ref = this.RTDB.ref(`gameData/Empire/games/${id}/users`);
+        ref.once('value')
+          .then((dataSnapshot) => {
             // handle read data.
-            if(asArray){
+            if (asArray) {
               let data = dataSnapshot.val();
-              resFunc(Object.keys(data).map( key => data[key] ))
-            }else{
+              resFunc(Object.keys(data).map(key => data[key]))
+            } else {
               resFunc(dataSnapshot.val());
             }
           }).catch((error) => {
@@ -475,6 +515,43 @@ export class EmpireService implements OnDestroy {
       });
     }
   }
+
+  addPresentGame(id: number): Promise<void> {
+    return new Promise<void>(async (resFunc, rejFunc) => {
+      let user = await this.currentUser();
+      if (user) {
+        var toAddRef = this.RTDB.ref(`userData/${user.uid}/empire/curGame`);
+        toAddRef.set(id, (error) => {
+          if (error) {
+            rejFunc(error);
+          } else {
+            resFunc();
+          }
+        })
+      } else {
+        rejFunc("User not signed in.");
+      }
+    })
+  }
+
+  getPresentGame(): Promise<number> {
+    return new Promise<number>(async (resFunc, rejFunc) => {
+      let user = await this.currentUser();
+      if (user) {
+        var getRef = this.RTDB.ref(`userData/${user.uid}/empire/curGame`);
+        getRef.once('value')
+        .then((dataSnapshot) => {
+          // handle read data.
+          resFunc(+dataSnapshot.val());
+        }).catch((error) => {
+          rejFunc(error);
+        });
+      } else {
+        rejFunc("User not signed in.");
+      }
+    })
+  }
+
 
   /**
    * 

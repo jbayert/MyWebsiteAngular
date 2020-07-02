@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { EmpireService } from '../../empire-service/empire.service';
 
 @Component({
@@ -10,6 +10,10 @@ export class ListCodeNamesComponent implements OnInit {
 
   delayLength: number;
 
+
+  @Input()
+  isMonitor:boolean = false;
+
   @Input()
   gameID: number;
 
@@ -19,8 +23,7 @@ export class ListCodeNamesComponent implements OnInit {
 
   codeNames;
 
-  constructor(private empireService: EmpireService,
-    private changeDetector: ChangeDetectorRef) {
+  constructor(private empireService: EmpireService,) {
     this.spinnerShown = true;
     this.delayLength = 3000;
     this.startButtonShown = false;
@@ -45,13 +48,11 @@ export class ListCodeNamesComponent implements OnInit {
   listCodenames() {
     return new Promise(async (resFunc, rejFunc) => {
       for (var key of Object.keys(this.codeNames)) {
-        console.log(`The next codename is ${this.codeNames[key]}`)
+        //console.log(`The next codename is ${this.codeNames[key]}`)
         this.nameShown = this.codeNames[key];
-        this.changeDetector.detectChanges();
         await this.sleeper(this.delayLength);
       }
       this.nameShown = "";
-      this.changeDetector.detectChanges();
       this.startButtonShown = true;
       resFunc("Names Finished");
     })

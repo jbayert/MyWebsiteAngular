@@ -11,6 +11,7 @@ import { PlayersJoinedComponent } from './players-joined/players-joined.componen
 import { OwnerComponent } from './owner/owner.component';
 import { GetDomainModule } from 'src/app/get-domain-service/get-domain.module';
 import { QRCodeModule } from 'angularx-qrcode';
+import { RestartGameComponent } from './restart-game/restart-game.component';
 
 @NgModule({
   declarations: [
@@ -19,6 +20,7 @@ import { QRCodeModule } from 'angularx-qrcode';
     ListCodeNamesComponent,
     PlayersJoinedComponent,
     OwnerComponent,
+    RestartGameComponent,
   ],
   imports: [
     CommonModule,

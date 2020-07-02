@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { EmpireService } from '../empire-service/empire.service';
 
 @Component({
@@ -19,7 +19,6 @@ export class ResultListComponent implements OnInit {
     let listen = this.empireService.getAllUsers(this._gameID);
     listen.then((data)=>{
       this.items =  data;
-      this.changeDetector.detectChanges();
     })
     .catch((error)=>{
       console.log(error);
@@ -28,8 +27,7 @@ export class ResultListComponent implements OnInit {
 
   items: any[];
 
-  constructor(private empireService:EmpireService,
-    private changeDetector: ChangeDetectorRef,) {
+  constructor(private empireService:EmpireService,) {
       this.items = [];
    }
 

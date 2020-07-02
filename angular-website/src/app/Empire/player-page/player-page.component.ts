@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ApplicationRef, NgZone } from '@angular/core';
 import { EmpireService } from '../empire-service/empire.service'
 import { GameState, GameStateOption } from '../empire-service/empire-data.model'
 import { Subscription } from 'rxjs';
@@ -31,10 +31,13 @@ export class PlayerPageComponent implements OnInit, OnDestroy {
   }
 
   constructor(private empireService: EmpireService,
-    private changeDetector: ChangeDetectorRef,
     private route: ActivatedRoute,
-    private router:Router) {
-    this.displayState = 'loading';
+    private router:Router,
+    private zone:NgZone,
+    private applicationRef:ApplicationRef) {
+    
+      this.displayState = 'loading';
+
   }
 
   ngOnInit(): void {
@@ -55,16 +58,16 @@ export class PlayerPageComponent implements OnInit, OnDestroy {
       if (this._gameID >0){
         let listener = await this.empireService.listenGameState(this._gameID);
         this.stateSubscription = listener.subscribe((gameState:GameState) => {
-          if (!!gameState) {
-            this.displayState = gameState.state;
-            this.gameState = gameState;
-          } else {
-  
+          this.zone.run(()=>{
+
+            if (!!gameState) {
+              this.displayState = gameState.state;
+              this.gameState = gameState;
+            } 
+            this.applicationRef.tick();
           }
-          this.changeDetector.detectChanges();
+          )
         })
-      }else{
-        this.changeDetector.detectChanges();
       }
     }catch(error){
       console.log(error);
@@ -77,5 +80,14 @@ export class PlayerPageComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     if (this.stateSubscription) { this.stateSubscription.unsubscribe() }
+  }
+
+  async joinNextGame(){
+    try{
+      var nextID = await this.empireService.getNextGame(this.gameID);
+      this.router.navigate(['../join'],{relativeTo:this.route,queryParams:{gameID:nextID}})
+    }catch(error){
+      console.error(error)
+    }
   }
 }

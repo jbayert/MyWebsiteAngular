@@ -21,12 +21,21 @@
     <h1>
         Game {{this.gameID}} is not valid!
     </h1>
+    <button routerLink = '/empire/join'>
+        Back
+    </button>
 </div>
 
-<div *ngIf="this.displayState === this.stateOptions.finished">
+
+
+
+<div *ngIf="(this.displayState === this.stateOptions.finished)||(this.displayState === this.stateOptions.restarted)">
     <h1>
-        game has finished
+        The Game has Finished
     </h1> 
+    <div *ngIf="this.displayState === this.stateOptions.restarted">
+        <button (click)="this.joinNextGame()">Join Next Game</button>
+    </div>  
     <app-result-list [gameID] = "this.gameID"></app-result-list>
-    
 </div>
+

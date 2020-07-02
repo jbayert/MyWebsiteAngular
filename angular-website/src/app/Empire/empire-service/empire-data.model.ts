@@ -8,6 +8,7 @@ export enum GameStateOption {
     acceptingUsers="accepting users",
     playing="playing" ,
     finished="finished",
+    restarted="restarted",
     null="null"
 }
 
@@ -49,6 +50,10 @@ export class GameState {
             }
             case "finished":{
                 this.state = GameStateOption.finished;
+                break;
+            }
+            case "restarted":{
+                this.state = GameStateOption.restarted;
                 break;
             }
             default:{
