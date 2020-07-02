@@ -13,7 +13,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { environment } from '../environments/environment';
 import { LoginPageComponent } from './auth/login-page/login-page.component';
 import { LoginModalComponent } from './auth/login-modal/login-modal.component';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { Page404Component } from './page404/page404.component'
 
 
 @NgModule({
@@ -22,7 +23,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
     HomeComponent,
     NavbarComponent,
     LoginPageComponent,
-    LoginModalComponent
+    LoginModalComponent,
+    Page404Component
   ],
   imports: [
     BrowserAnimationsModule,

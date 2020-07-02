@@ -1,10 +1,10 @@
-<h1>Empire List</h1>
+<h1>Players Names</h1>
 
 <div class = "flex-container">
       
-  <div *ngFor="let item of items | async" class="card-hover">
+  <div *ngFor="let item of items" class="card-hover">
     <div class="container">
-      <h4><b>{{item.name}}</b></h4> 
+      <h4><b>{{item.username}}</b></h4> 
       <hr>
       <p>{{item.codename}}</p> 
     </div>

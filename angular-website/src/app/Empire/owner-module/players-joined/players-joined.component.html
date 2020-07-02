@@ -1,0 +1,16 @@
+<h1>Join the game at {{this.joinUrl}}</h1>
+<qrcode [qrdata]="this.joinUrlwithID" [width]="256" [errorCorrectionLevel]="'M'"></qrcode>
+<h2>Enter game code {{this.curGameID}}</h2>
+
+
+<button [hidden]="this.isMonitor" (click) = startGame()>Start the Game</button>
+
+<h2>Players that have Joined</h2>
+
+<div class = "flex-container">
+  <div *ngFor="let item of items | async" class="card-hover">
+    <div class="container">
+      <h4><b>{{item.username}}</b></h4> 
+    </div>
+  </div>  
+</div>

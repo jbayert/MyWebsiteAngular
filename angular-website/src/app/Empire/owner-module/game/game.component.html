@@ -1,0 +1,32 @@
+<app-players-joined [gameID]="this.gameID" [isMonitor]="this.isMonitor" *ngIf="this.displayState === this.stateOptions.acceptingUsers">
+</app-players-joined>
+<mat-spinner [hidden]="this.displayState !== 'loading'"></mat-spinner>
+
+<div *ngIf="this.displayState === this.stateOptions.playing">
+    <app-list-code-names [isMonitor]="this.isMonitor" [gameID]="this.gameID"></app-list-code-names>
+</div>
+
+
+<div *ngIf="this.displayState === this.stateOptions.null">
+    <h1>
+        Game {{this.gameID}} is not valid!
+    </h1>
+    <button routerLink = '/empire'>
+        Back
+    </button>
+</div>
+
+<div *ngIf="this.displayState === this.stateOptions.restarted">
+    <h1>
+        The Game is Restarting.
+    </h1>
+</div>
+
+<div *ngIf="this.displayState === this.stateOptions.finished">
+    <h1>
+        The Game has Finished
+    </h1> 
+    <app-restart-game [gameID] = "this.gameID" [hidden]="this.isMonitor"></app-restart-game>
+    <app-result-list [gameID] = "this.gameID"></app-result-list>
+    
+</div>

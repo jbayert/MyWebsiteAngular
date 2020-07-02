@@ -1,43 +1,63 @@
 <header>
-    <h2>Join a game</h2>
-  </header>
-  <form
-    [formGroup] = "form"
-    (ngSubmit)= "onSubmit(form.value)">
+  <h2 *ngIf="!guestID">Join a game</h2>
+  <div *ngIf="guestID">
+    <h3> Join as a guest</h3>
+    <p>Joining as a guest allows multiple users to join.</p>
+  </div>
+</header>
+<form [formGroup]="form" (ngSubmit)="onSubmit(form.value)">
 
-    <div>
-      <label for="gameID">Game ID</label>
-      <input type="int" class="form-control" name="gameID" id="gameID" formControlName = "gameID">
-        
-      <div *ngIf = "form.get('gameID').errors&&(!form.get('gameID').pristine)">
-        <div class="alert alert-danger" *ngIf = "form.get('gameID').errors.required; else elseBlock">
-            GameID is required
-        </div> 
-        <ng-template #elseBlock >
-            <div class="alert alert-danger" *ngIf = "form.get('gameID').errors.idOutOfRange as yearErrors">
-                Must be between {{yearErrors.min}} and {{yearErrors.max}}
-            </div> 
-        </ng-template>
+  <div>
+    <label for="gameID">Game ID</label>
+    <input type="int" class="form-control" name="gameID" id="gameID" formControlName="gameID">
+
+    <div *ngIf="form.get('gameID').errors">
+      <div class="alert alert-danger"
+        *ngIf="form.get('gameID').errors.required &&(!form.get('gameID').pristine); else elseBlock">
+        GameID is required
       </div>
-
+      <ng-template #elseBlock>
+        <div *ngIf="form.get('gameID').errors.idOutOfRange as yearErrors; else invalidIdBlock">
+          <div class="alert alert-danger" *ngIf="!form.get('gameID').pristine; else invalidIdBlock">
+            Must be between {{yearErrors.min}} and {{yearErrors.max}}
+          </div>
+        </div>
+      </ng-template>
+      <ng-template #invalidIdBlock>
+        <div class="alert alert-danger" *ngIf="form.get('gameID').errors.invalidID as invalidID;">
+          Invalid Game ID
+        </div>
+      </ng-template>
     </div>
 
-    <div>
-      <label for="username">Your Name</label>
-      <input type="text" class="form-control" name="username" id="username" formControlName = "username">
-      <div class="alert alert-danger" *ngIf = "form.get('username').errors&&(!form.get('username').pristine)">
-        Your Name is required.
-    </div> 
+  </div>
+
+  <div>
+    <label for="username">Your Name</label>
+    <input type="text" class="form-control" name="username" id="username" formControlName="username">
+    <div class="alert alert-danger" *ngIf="form.get('username').errors&&(!form.get('username').pristine)">
+      Your Name is required.
     </div>
+  </div>
 
-    <div>
-      <label for="codename">Code Name</label>
-      <input type="text" class="form-control" name="codename" id="codename" formControlName = "codename">
-      <div class="alert alert-danger" *ngIf = "form.get('codename').errors&&(!form.get('codename').pristine)">
-        Your code name is required.
-      </div> 
+  <div>
+    <label for="codename">Code Name</label>
+    <input type="text" class="form-control" name="codename" id="codename" formControlName="codename">
+    <div class="alert alert-danger" *ngIf="form.get('codename').errors&&(!form.get('codename').pristine)">
+      Your code name is required.
     </div>
+  </div>
 
 
-    <button type="submit" [disabled] = "!form.valid">Save</button>
-  </form>
+  <button type="submit" [disabled]="!(form.valid && this.submitEnabled)">
+    {{this.submitBtnText}}
+  </button>
+  <mat-spinner [hidden]="this.submitEnabled"></mat-spinner>
+</form>
+
+<button [disabled]="this.form.get('gameID').errors" (click)="this.switchToPlayerTab()">
+  Continue Without Joining
+</button>
+
+
+<app-snackbar [text] = "snackbarText" [showEvent] = "this.showSnackbarSubject.asObservable()"></app-snackbar>

@@ -1,0 +1,41 @@
+<div *ngIf="this.displayState === this.stateOptions.acceptingUsers">
+    <h1>
+        Waiting for the game to start. 
+    </h1>
+    <h1>
+        Don't tell anyone your Code Name.
+    </h1>
+    <button (click) = "addGuest()">Add another player</button>
+</div>
+
+<div *ngIf="this.displayState === this.stateOptions.playing">
+    <h1>
+        The game is currently playing. 
+    </h1>
+    <h1>
+        Don't forget any names.
+    </h1>
+</div>
+
+<div *ngIf="this.displayState === this.stateOptions.null">
+    <h1>
+        Game {{this.gameID}} is not valid!
+    </h1>
+    <button routerLink = '/empire/join'>
+        Back
+    </button>
+</div>
+
+
+
+
+<div *ngIf="(this.displayState === this.stateOptions.finished)||(this.displayState === this.stateOptions.restarted)">
+    <h1>
+        The Game has Finished
+    </h1> 
+    <div *ngIf="this.displayState === this.stateOptions.restarted">
+        <button (click)="this.joinNextGame()">Join Next Game</button>
+    </div>  
+    <app-result-list [gameID] = "this.gameID"></app-result-list>
+</div>
+
