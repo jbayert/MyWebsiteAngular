@@ -1,0 +1,1 @@
+ng deploy --repo https://github.com/jbayert/jbayert.github.io --branch=master --cname=jonbayert.com

@@ -8,7 +8,7 @@ import "firebase/firestore";
 import { Injectable, OnDestroy } from '@angular/core';
 import { EmpireServiceModule } from './empire-service.module'
 import { AngularFireDatabase } from '@angular/fire/database';
-import { EmpireConfig } from '../empire-config';
+import { EmpireConfig } from 'src/environments/empire-config';
 
 import { AngularFireAuth } from '@angular/fire/auth';
 import { Subscription } from 'rxjs';

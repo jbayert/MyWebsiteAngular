@@ -1,6 +1,6 @@
 /**
- * Two files are not included because the contain api keys.
- * use this file to create the following two files:
+ * Two files are not included because they contain api keys.
+ * use this template file to create the following two files:
  * firebaseConfig.ts
  * firebaseConfig.prod.ts
  */

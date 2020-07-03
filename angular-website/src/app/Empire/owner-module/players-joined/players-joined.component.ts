@@ -2,7 +2,7 @@ import { Component, OnInit, Input, Inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import {EmpireService } from '../../empire-service/empire.service';
 import { GetDomainService } from 'src/app/get-domain-service/get-domain.service';
-import { EmpireConfig } from '../../empire-config';
+import { EmpireConfig } from 'src/environments/empire-config';
 
 
 @Component({

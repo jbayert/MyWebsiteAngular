@@ -51,13 +51,13 @@
           "configurations": {
             "production": {
               "fileReplacements": [
+                {   
+                  "replace": "src/environments/empire-config.ts",
+                  "with":"src/environments/empire-config.prod.ts"
+                },
                 {
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.prod.ts"
-                },
-                {
-                  "replace": "src/app/Empire/empire-config.ts",
-                  "with": "src/app/Empire/empire-config.prod.ts"
                 }
               ],
               "optimization": true,

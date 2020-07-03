@@ -3,5 +3,5 @@ export const EmpireConfig = {
         minID: 10000,//inclusive
         maxID: 99999
     },
-    joinUrl:"/join",
+    joinUrl:"https://jonbayert.com/empire/join",
 }
