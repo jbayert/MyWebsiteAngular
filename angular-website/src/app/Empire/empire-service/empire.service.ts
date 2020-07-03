@@ -553,6 +553,36 @@ export class EmpireService implements OnDestroy {
   }
 
 
+  addPresentMessage(message: string): Promise<void> {
+    return new Promise<void>(async (resFunc, rejFunc) => {
+      let user = await this.currentUser();
+      if (user) {
+        var toAddRef = this.RTDB.ref(`userData/${user.uid}/empire/PresentMessage`);
+        toAddRef.set(message, (error) => {
+          if (error) {
+            rejFunc(error);
+          } else {
+            resFunc();
+          }
+        })
+      } else {
+        rejFunc("User not signed in.");
+      }
+    })
+  }
+
+  listentPresentMessage(): Promise<Observable<any>> {
+    return new Promise<Observable<any>>(async (resFunc, rejFunc) => {
+      let user = await this.currentUser();
+      if (user) {
+        resFunc(this.AngularDB.object('item').valueChanges())
+      } else {
+        rejFunc("User not signed in.");
+      }
+    })
+  }
+
+
   /**
    * 
    */
