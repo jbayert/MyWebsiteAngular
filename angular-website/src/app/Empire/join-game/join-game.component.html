@@ -41,8 +41,8 @@
   </div>
 
   <div>
-    <label for="codename">Code Name</label>
-    <input type="text" class="form-control" name="codename" id="codename" formControlName="codename">
+    <label for="codename">Your Secret Name</label>
+    <input type="text" class="form-control" name="codename" id="codename" formControlName="codename" autocomplete="off">
     <div class="alert alert-danger" *ngIf="form.get('codename').errors&&(!form.get('codename').pristine)">
       Your code name is required.
     </div>
@@ -50,13 +50,13 @@
 
 
   <button type="submit" [disabled]="!(form.valid && this.submitEnabled)">
-    {{this.submitBtnText}}
+    Join
   </button>
   <mat-spinner [hidden]="this.submitEnabled"></mat-spinner>
 </form>
 
 <button [disabled]="this.form.get('gameID').errors" (click)="this.switchToPlayerTab()">
-  Continue Without Joining
+  Skip
 </button>
 
 

@@ -553,7 +553,7 @@ export class EmpireService implements OnDestroy {
   }
 
 
-  addPresentMessage(message: string): Promise<void> {
+  /*addPresentMessage(message: string): Promise<void> {
     return new Promise<void>(async (resFunc, rejFunc) => {
       let user = await this.currentUser();
       if (user) {
@@ -580,7 +580,7 @@ export class EmpireService implements OnDestroy {
         rejFunc("User not signed in.");
       }
     })
-  }
+  }*/
 
 
   /**

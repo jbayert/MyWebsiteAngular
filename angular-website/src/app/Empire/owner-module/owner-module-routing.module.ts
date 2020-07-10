@@ -9,8 +9,8 @@ import { MonitorComponent } from './monitor/monitor.component';
 const routes: Routes = [
   { path: 'createGame', component: CreateGameComponent },
   { path: 'game', component: GameComponent },
-  { path: 'present', component: GameComponent, data:{isMonitor:true} },
-  { path: '', component: OwnerComponent, },
+  //{ path: 'present', component: GameComponent, data:{isMonitor:true} },
+  //{ path: '', component: OwnerComponent, },
 ];
 
 @NgModule({

@@ -3,7 +3,6 @@ import { FormGroup, FormControl, Validators, AbstractControl, ValidationErrors }
 import { EmpireService } from '../empire-service/empire.service';
 import { UserProfile } from '../empire-service/empire-data.model';
 import { ActivatedRoute, Router } from '@angular/router';
-import { GetDomainService } from 'src/app/get-domain-service/get-domain.service';
 import { Subject } from 'rxjs';
 
 @Component({
@@ -61,7 +60,7 @@ export class JoinGameComponent implements OnInit {
       gameToJoin.gameID);
     this.submitEnabled = false;
     this.empireService.joinGame(newUser, this.guestID).then((value) => {
-      if(this.guestID){
+      /*if(this.guestID){
         console.log(value);
         let name = this.form.get('username').value;
         this.form.get('username').setValue('');
@@ -73,10 +72,9 @@ export class JoinGameComponent implements OnInit {
         //snackbar
         this.snackbarText = `${name} was added.`
         this.showSnackbarSubject.next(true);
-      }else{
-        this.switchToPlayerTab();
-        //this.router.navigate(['../player'],{relativeTo: this.activatedRoute,queryParams:{gameID:gameToJoin.gameID }})
-      }
+      }*/
+      this.switchToPlayerTab();
+
     }).catch((error) => {
       console.log(error);
       this.submitEnabled = true;

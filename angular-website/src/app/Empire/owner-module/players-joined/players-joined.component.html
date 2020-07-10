@@ -1,6 +1,6 @@
 <h1>Join the game at {{this.joinUrl}}</h1>
+<h2>Enter game ID: {{this.curGameID}}</h2>
 <qrcode [qrdata]="this.joinUrlwithID" [width]="256" [errorCorrectionLevel]="'M'"></qrcode>
-<h2>Enter game code {{this.curGameID}}</h2>
 
 
 <button [hidden]="this.isMonitor" (click) = startGame()>Start the Game</button>
